@@ -1,0 +1,32 @@
+<aura:component controller="UsersManagmentController" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <!-- attributes -->
+    <aura:attribute name="netList" type="Network[]"/>
+    <aura:attribute name="mydata" type="User[]"/>
+    <aura:attribute name="mycolumns" type="List" />
+    <aura:attribute name="selectedNetworkId" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <!-- <lightning:combobox name="progress" label="Status" value="inProgress" placeholder="Select Progress" options="{! v.netList }" onchange="{! c.handleChange }"/> -->
+
+   <!--select component for communities-->
+   <lightning:select name="select network" label="Networks" required="true" onchange="{! c.handleChange }">
+        <option value="" label="Choose community" hidden="true">Choose community</option>
+        <aura:iteration items="{!v.netList}" var="net">
+
+        <option value="{!net.Id}" text="{!net.Name}" />
+
+     </aura:iteration>
+    </lightning:select>
+
+      <!--Data table of all community users-->
+
+
+
+        <lightning:datatable data="{! v.mydata }"
+            columns="{! v.mycolumns }"
+            keyField="Id"
+           />
+
+</aura:component>
