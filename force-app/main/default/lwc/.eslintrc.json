@@ -6,8 +6,12 @@
       "rules": {
         "@lwc/lwc/no-unexpected-wire-adapter-usages": "off"
       },
+      "parserOptions": {
+        "ecmaVersion": 2017
+    },
       "env": {
-        "node": true
+        
+        "es6": true
       }
     }
   ]
