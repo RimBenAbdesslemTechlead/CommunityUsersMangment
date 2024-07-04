@@ -28,6 +28,31 @@
         helper.allUserName(component,event.getParam('value'));
         
         
+    },
+    handleNavigates: function(component) {
+        var navService = component.find("navService");
+        var pageReference = {
+            type: "standard__webPage",
+            attributes: {
+                url: '/c/AddNewUsers.app'
+            }
+        };
+        navService.navigate(pageReference);
+    },
+    handleClick: function() {
+        //     var navService = component.find("navService");
+        //     var pageReference = {
+        //         type: "standard__webPage",
+        //         attributes: {
+        //             url: '/c/App2.app'
+        //         }
+        //     };
+        //     navService.navigate(pageReference);
+        // }
+        var domain =window.location.origin;
+        window.open(domain+ "/c/AddNewUsers.app","_self");
     }
-
+  
+    
+    
 })

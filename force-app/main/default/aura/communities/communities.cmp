@@ -6,7 +6,8 @@
     <aura:attribute name="mycolumns" type="List" />
     <aura:attribute name="selectedNetworkId" type="String" />
     <aura:attribute name="textvalue" type="String" default=""/>
-    
+    <aura:dependency resource="lightning:navigation" />
+    <lightning:navigation aura:id="navService" />
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <!-- <lightning:combobox name="progress" label="Status" value="inProgress" placeholder="Select Progress" options="{! v.netList }" onchange="{! c.handleChange }"/> -->
@@ -29,6 +30,9 @@
             value="{! v.textvalue }"  label="Enter some text"
             onchange="{! c.handleInputChange}"
             />
+
+            <!-- button and event to navigate to component 2 -->
+        
         <lightning:button aura:id="focus" label="Add user"
             onclick="{! c.handleClick }" />
     </lightning:layoutItem>
