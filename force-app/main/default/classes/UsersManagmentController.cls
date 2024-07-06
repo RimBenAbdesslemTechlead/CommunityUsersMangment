@@ -53,6 +53,30 @@ public with sharing class UsersManagmentController {
             throw new AuraHandledException(e.getMessage());
         }
     }
+
+
+    @AuraEnabled
+    public static String getNewUser(String name,String email,String alias,String username,String tz,String loc,String emlenco,String lang){
+
+        Account Acc = [select Name, Id ,OwnerId, Owner.Name From Account where OwnerId != null And Owner.Name='user user' limit 1];
+        Contact Contactini = new Contact(lastName='apexx code account', AccountId = Acc.Id);
+        insert Contactini;
+        System.debug('name : '+ name + ' email : '+ email + ' alias : '+ alias + ' username : '+ username+'tz : '+tz + 'loc : '+ loc +'emlenco : '+ emlenco + 'lang : '+ lang);
+        User uss = new User(lastName = name,
+                            email = email,
+                            alias = alias,
+                            ProfileId = '00eQI000002DQ8qYAG',
+                            ContactId =Contactini.Id,
+                            username= username,
+                            TimeZoneSidKey = tz,
+                            LocaleSidKey = loc,
+                            EmailEncodingKey= emlenco,
+                            LanguageLocaleKey = lang);
+        insert uss;
+        
+        return 'ID : ' +  uss;
+    }
+    
     
     
 }

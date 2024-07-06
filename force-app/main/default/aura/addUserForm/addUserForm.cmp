@@ -1,25 +1,25 @@
-<aura:component>
-   
+<aura:component controller="UsersManagmentController" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="formData" type="Object"/>
+    <aura:attribute name="textvalue" type="String" default=""/>
+
     <lightning:card iconName="standard:user" title="Add a User">
         
             <lightning:layout>
                 <lightning:layoutItem size="6" padding="around-small">
-                    <lightning:input  label="First Name" type="email" value="{!v.newContact.Email}"/>
-                    <lightning:input  label="LastName" type="email" value="{!v.newContact.Email}"/>
-                    <lightning:input  label="Email" type="email" value="{!v.newContact.Email}"/>
-                    <lightning:select name="selectItem" label="Select an item" onchange="{!c.doSomething}">
-                        <option value="" hidden="'true">choose one...</option>
-                        <option value="1">account One</option>
-                        <option value="2">account two</option>
-                        <option value="3">account three</option>
-                        >
-                    </lightning:select>
-                    <lightning:input  label="Email" type="email" value="{!v.newContact.Email}"/>
-                </lightning:layoutItem> 
-               
-                <lightning:button label="Create User" onclick="{!c.handleCreateContact}" variant="brand" class="slds-m-top_medium"/>
+                    <lightning:input aura:id="lastname" type="text"
+                    label="Last Name" name="lastName"
+                    />
+                    <lightning:input  aura:id="email" name="Email" label="Emails" type="email"/>
+                    <lightning:input  aura:id="alias" label="Alia" type="text" />
+                    <lightning:input  aura:id="username" label="Username" type="text" />
+                    <lightning:input  aura:id="profile" label="profile" type="text" />
+                    <lightning:input  aura:id="tz" label="TimeZone" type="text" value="Africa/Tunis"/>
+                    <lightning:input  aura:id="loc" label="Locale" type="text" value="ar_TN"/>
+                    <lightning:input  aura:id="emlenco" label="EmailEncoding" type="text" value="UTF-8"/>
+                    <lightning:input  aura:id="lang" label="lang" type="text" value="en_US"/>
+                    <lightning:button label="create" onclick="{! c.createUser}"></lightning:button>
+                </lightning:layoutItem>  
             </lightning:layout>
-           
-        
     </lightning:card>
 </aura:component>	
