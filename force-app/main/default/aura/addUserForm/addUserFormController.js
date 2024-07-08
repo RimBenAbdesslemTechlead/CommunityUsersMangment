@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 ({
-    init: function() {
+    init: function(component, event, helper) {
         // eslint-disable-next-line no-console
         console.log('Component Initialized');
+        helper.getAllProfiles(component);
+        helper.allContactsWithOwner(component);
     },
 
     createUser : function(component, event, helper){
@@ -14,9 +16,10 @@
         var loc = component.find('loc').get("v.value")
         var emlenco = component.find('emlenco').get("v.value");
         var lang = component.find('lang').get("v.value")
-        
-        console.log('lastname c', lastname, email, alias, username, tz,loc,emlenco, lang);
+        var contactId = component.find('selectContact').get("v.value");
+        var ProfileId = component.find('selectProfile').get("v.value");
+        console.log('lastname c', lastname, email, alias, username, tz,loc,emlenco, lang, 'conta------',contactId,'prf id' , ProfileId );
 
-        helper.createNewUser(component,lastname, email, alias, username, tz,loc,emlenco, lang);
+        helper.createNewUser(component,lastname, email, alias, username, tz,loc,emlenco, lang, contactId, ProfileId);
     }
 })

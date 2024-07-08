@@ -53,20 +53,58 @@ public with sharing class UsersManagmentController {
             throw new AuraHandledException(e.getMessage());
         }
     }
+    //get contacts when the pages if first loaded
+    @AuraEnabled
+    public static List<Contact> getContacts(){
+        // Step 1: Retrieve IDs of users who have a role
+        List<Id> userIdsWithRole = new List<Id>();
+        for (User user : [SELECT Id FROM User WHERE UserRoleId != NULL]) {
+            userIdsWithRole.add(user.Id);
+        }
+        
+        // Step 2: Retrieve IDs of accounts owned by these users
+        List<Id> accountIds = new List<Id>();
+        if (!userIdsWithRole.isEmpty()) {
+            for (Account account : [SELECT Id FROM Account WHERE OwnerId IN :userIdsWithRole]) {
+                accountIds.add(account.Id);
+            }
+        }
+        
+        // Step 3: Retrieve IDs of contacts related to these accounts
+        List<Contact> contactIds = new List<Contact>();
+        if (!accountIds.isEmpty()) {
+            for (Contact contact : [SELECT Id, Name FROM Contact WHERE AccountId IN :accountIds and Id not In (select contactId from user where contactId != null)]) {
+                contactIds.add(contact);
+            }
+        }
 
+return contactIds;
+    }
+
+    //get the list of possible profiles:
+    @auraEnabled
+    public static List<Profile> getProfiles(){
+        List<UserLicense> customerUserLicenses = [
+                    SELECT Id 
+                    FROM UserLicense 
+                    WHERE Name IN ('Customer Community', 'Customer Community Login')
+                ];
+                // Step 2: Retrieve profiles associated with these UserLicense IDs
+                List<Profile> profilesList = [SELECT Id, Name FROM Profile WHERE UserLicenseId IN :customerUserLicenses];
+                System.debug('profilesList' + profilesList);
+                return profilesList;
+            
+            }
 
     @AuraEnabled
-    public static String getNewUser(String name,String email,String alias,String username,String tz,String loc,String emlenco,String lang){
+    public static String getNewUser(String name,String email,String alias,String username,String tz,String loc,String emlenco,String lang, String contactId, String profileId){
 
-        Account Acc = [select Name, Id ,OwnerId, Owner.Name From Account where OwnerId != null And Owner.Name='user user' limit 1];
-        Contact Contactini = new Contact(lastName='apexx code account', AccountId = Acc.Id);
-        insert Contactini;
-        System.debug('name : '+ name + ' email : '+ email + ' alias : '+ alias + ' username : '+ username+'tz : '+tz + 'loc : '+ loc +'emlenco : '+ emlenco + 'lang : '+ lang);
+        System.debug('profile : ' + profileId);
         User uss = new User(lastName = name,
                             email = email,
                             alias = alias,
-                            ProfileId = '00eQI000002DQ8qYAG',
-                            ContactId =Contactini.Id,
+                            ProfileId = profileId,
+                            ContactId =contactId,
                             username= username,
                             TimeZoneSidKey = tz,
                             LocaleSidKey = loc,

@@ -26,7 +26,7 @@
             else if (response.getState() === "ERROR") {
                 var errors = response.getError();
                 // eslint-disable-next-line no-console
-                console.error(errors);
+                console.error('errors :', errors);
             }
         })
     $A.enqueueAction(action);

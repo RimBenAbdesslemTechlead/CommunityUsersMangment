@@ -11,8 +11,10 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <!-- <lightning:combobox name="progress" label="Status" value="inProgress" placeholder="Select Progress" options="{! v.netList }" onchange="{! c.handleChange }"/> -->
-
+    <lightning:button aura:id="focus" label="Add user"
+    onclick="{! c.handleClick }" />
     <lightning:layout class="slds-grid slds-wrap">
+      
       <lightning:layoutItem size="6" padding="around-small">
         <!--select component for communities-->
         <lightning:select name="select network" label="Networks" required="true" onchange="{! c.handleChange }">
@@ -31,10 +33,7 @@
             onchange="{! c.handleInputChange}"
             />
 
-            <!-- button and event to navigate to component 2 -->
-        
-        <lightning:button aura:id="focus" label="Add user"
-            onclick="{! c.handleClick }" />
+            
     </lightning:layoutItem>
 
 
@@ -47,6 +46,10 @@
                               keyField="Id"
                               />
         </lightning:layoutItem>
+
       </lightning:layout>
+      <!-- button and event to navigate to component 2 -->
+        
+      
       </aura:component>
     
