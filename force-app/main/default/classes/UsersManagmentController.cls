@@ -35,7 +35,7 @@ public with sharing class UsersManagmentController {
     public static List<UserWrapper> getCommunityUserByProfiles(String networkId, String userName){
         try {
             List<User> CommunityUser = new List<User>();
-            System.debug(userName);
+            // System.debug(userName);
             if(userName == null){
 
                 CommunityUser = [select Name,Account.Name , Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId )];
@@ -91,15 +91,16 @@ return contactIds;
                 ];
                 // Step 2: Retrieve profiles associated with these UserLicense IDs
                 List<Profile> profilesList = [SELECT Id, Name FROM Profile WHERE UserLicenseId IN :customerUserLicenses];
-                System.debug('profilesList' + profilesList);
+                // System.debug('profilesList' + profilesList);
                 return profilesList;
             
             }
 
+            //create a single user
     @AuraEnabled
     public static String getNewUser(String name,String email,String alias,String username,String tz,String loc,String emlenco,String lang, String contactId, String profileId){
 
-        System.debug('profile : ' + profileId);
+        // System.debug('profile : ' + profileId);
         User uss = new User(lastName = name,
                             email = email,
                             alias = alias,
@@ -113,6 +114,28 @@ return contactIds;
         insert uss;
         
         return 'ID : ' +  uss;
+    }
+    //create many users
+    @AuraEnabled
+    public static void createNewUsers(List<User> users){
+        // List to hold created User records
+        List<User> createdUsers = new List<User>();
+        
+        for (User newUser : users) {
+            System.debug('User to be created: ' + newUser.LastName);
+            
+            // Optionally, add additional validation or processing logic here
+            
+            // Add the User record to the list
+            createdUsers.add(newUser);
+        }
+        
+        // Optionally, insert all User records into the database
+        try {
+            insert createdUsers;
+        } catch (DmlException exe) {
+            System.debug('DML exception' + exe);
+        }
     }
     
     

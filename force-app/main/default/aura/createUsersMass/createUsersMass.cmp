@@ -1,0 +1,26 @@
+<aura:component controller="UsersManagmentController" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="profiles" type="Profile[]"/>
+    <aura:attribute name="contacts" type="Contact[]"/>
+    <aura:attribute name="numberOfUserToAdd" type="Integer" default="0"/>
+    <aura:attribute name="form" type="Object[]"/>
+    <aura:attribute name="allData" type="Object[]"/>
+    <aura:attribute name="addUserButtonActive" type="Boolean"  default="true"/>
+    <aura:attribute name="NbUsers" type="Integer" default="1"/>
+    <aura:attribute name="isLoading" type="Boolean" default="true"/>
+    <div>add as many forms as ou need to create users in mass</div>
+    <lightning:layout  multipleRows="true" horizontalAlign="center">
+        <lightning:layoutItem size="6" >
+            
+        {! v.body}
+        <lightning:button label="add other users" aura:id="addNewUser" onclick="{! c.handleNewUserClick}" disabled="{! !v.addUserButtonActive}" />
+        <lightning:button label="create users" aura:id="createUsersButton" onclick="{! c.createUsersMass}"/>
+        <aura:if isTrue="{! v.isLoading}">
+                <div>
+                    Loading form...
+                </div>
+            </aura:if>
+    </lightning:layoutItem>
+    </lightning:layout>
+
+    </aura:component>

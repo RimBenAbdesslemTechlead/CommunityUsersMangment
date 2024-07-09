@@ -16,7 +16,34 @@
      handleChange: function(component, event, helper) {
         var selectedNetworkId = event.getSource().get("v.value");
         component.set("v.selectedNetworkId", selectedNetworkId);
-        helper.allUserName(component, null);
+        helper.allUserName(component, null, helper);
+    },
+    updateSorting: function (cmp, event, helper) {
+        var fieldName = event.getParam('fieldName');
+        var sortDirection = event.getParam('sortDirection');
+        cmp.set("v.sortedBy", fieldName);
+        cmp.set("v.sortedDirection", sortDirection);
+        helper.sortData(cmp, fieldName, sortDirection);
+    },
+     
+    handleNext: function(component, event, helper){        
+        component.set("v.currentPageNumber", component.get("v.currentPageNumber") + 1);
+        helper.setPaginateData(component);
+    },
+     
+    handlePrevious: function(component, event, helper){
+       component.set("v.currentPageNumber", component.get("v.currentPageNumber") - 1);
+       helper.setPaginateData(component);
+    },
+     
+    onFirst: function(component, event, helper) {        
+        component.set("v.currentPageNumber", 1);
+        helper.setPaginateData(component);
+    },
+     
+    onLast: function(component, event, helper) {        
+        component.set("v.currentPageNumber", component.get("v.totalPages"));
+        helper.setPaginateData(component);
     },
 
     //search input onChange to get users
@@ -29,28 +56,14 @@
         
         
     },
-    handleNavigates: function(component) {
-        var navService = component.find("navService");
-        var pageReference = {
-            type: "standard__webPage",
-            attributes: {
-                url: '/c/AddNewUsers.app'
-            }
-        };
-        navService.navigate(pageReference);
-    },
-    handleClick: function() {
-        //     var navService = component.find("navService");
-        //     var pageReference = {
-        //         type: "standard__webPage",
-        //         attributes: {
-        //             url: '/c/App2.app'
-        //         }
-        //     };
-        //     navService.navigate(pageReference);
-        // }
+    
+    handleAddOneClick: function() {
         var domain =window.location.origin;
         window.open(domain+ "/c/AddNewUsers.app","_self");
+    },
+    handleAddManyClick : function(){
+       var MyDomain = window.location.origin;
+       window.open(MyDomain+ '/c/createUserMassApp.app', '_self');
     }
   
     

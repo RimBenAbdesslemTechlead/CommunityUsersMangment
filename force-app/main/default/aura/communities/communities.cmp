@@ -2,17 +2,40 @@
     
     <!-- attributes -->
     <aura:attribute name="netList" type="Network[]"/>
-    <aura:attribute name="mydata" type="Object[]"/>
-    <aura:attribute name="mycolumns" type="List" />
+    
+    
     <aura:attribute name="selectedNetworkId" type="String" />
     <aura:attribute name="textvalue" type="String" default=""/>
     <aura:dependency resource="lightning:navigation" />
     <lightning:navigation aura:id="navService" />
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
+    <!-- new pagination list attributes -->
+    <aura:attribute name="currentPageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="totalPages" type="Integer" default="0"/>
+    <aura:attribute name="pageList" type="List"/>
+    <aura:attribute name="totalRecords" type="Integer" />
+    <aura:attribute name="currentPageRecords" type="Integer" />
+
+    <!-- sorting data variables -->
+    <aura:attribute name="mycolumns" type="List" />
+    <aura:attribute name="sortedBy" type="String" default="Name"/>
+    <aura:attribute name="sortedDirection" type="string" default="asc" />
+
+    <!-- data to print -->
+    <aura:attribute name="listOfAccounts" type="Object[]"/> 
+    <aura:attribute name="paginationList" type="Object[]"/>
+    <aura:attribute name="mydata" type="Object[]"/>
+
+
+
     <!-- <lightning:combobox name="progress" label="Status" value="inProgress" placeholder="Select Progress" options="{! v.netList }" onchange="{! c.handleChange }"/> -->
-    <lightning:button aura:id="focus" label="Add user"
-    onclick="{! c.handleClick }" />
+    <lightning:button aura:id="addOneUserBtn" label="Add user"
+    onclick="{! c.handleAddOneClick }" />
+    <lightning:button label="add many users" aura:id="addOneUserBtn"
+    onclick="{! c.handleAddManyClick}" />
+
     <lightning:layout class="slds-grid slds-wrap">
       
       <lightning:layoutItem size="6" padding="around-small">
@@ -41,13 +64,45 @@
       
       <!--Data table of all community users-->
       <lightning:layoutItem size="12" padding="around-small">
-        <lightning:datatable  data="{! v.mydata }"
-                              columns="{! v.mycolumns }"
-                              keyField="Id"
-                              />
+        <lightning:datatable keyField="id" data="{!v.paginationList}"
+                                        columns="{!v.mycolumns}"
+                                        hideCheckboxColumn="true"
+                                        onsort="{!c.updateSorting}"
+                                        sortedBy="{!v.sortedBy}"
+                                        sortedDirection="{!v.sortedDirection}"  />
         </lightning:layoutItem>
-
       </lightning:layout>
+      <div class="slds-align_absolute-center"> 
+        <lightning:button label="First"
+                          iconName="utility:left"
+                          iconPosition="left"
+                          onclick="{!c.onFirst}"
+                          disabled="{! v.currentPageNumber == 1}" />
+        <lightning:button label="Previous"
+                          disabled="{!v.currentPageNumber == 1}" 
+                          onclick="{!c.handlePrevious}"
+                          variant="brand"
+                          iconName="utility:back"
+                          name="previous"/>
+         
+        <span class="slds-badge slds-badge_lightest"
+              style="margin-right: 10px;margin-left: 10px;">
+            Page {!v.currentPageNumber} out of {!v.totalPages}
+        </span>
+         
+        <lightning:button label="Next"
+                          disabled="{!v.currentPageNumber == v.totalPages}"
+                          onclick="{!c.handleNext}"
+                          variant="brand"
+                          iconName="utility:forward"
+                          iconPosition="right"
+                          name="next"/>
+        <lightning:button label="Last"
+                          iconName="utility:right"
+                          iconPosition="right"
+                          onclick="{!c.onLast}"
+                          disabled="{!v.currentPageNumber == v.totalPages}" />
+    </div>
       <!-- button and event to navigate to component 2 -->
         
       
