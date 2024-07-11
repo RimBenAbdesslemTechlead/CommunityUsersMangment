@@ -6,12 +6,20 @@ public with sharing class UsersManagmentController {
         @AuraEnabled public String Name { get; set; }
         @AuraEnabled public String ProfileName { get; set; }
         @AuraEnabled public String AccountName { get; set; }
+        @AuraEnabled public String email { get; set; }
+        @AuraEnabled public String alias { get; set; }
+        @AuraEnabled public String username { get; set; }
+        @AuraEnabled public Boolean isActive {get; set;}
         
         public UserWrapper(User u) {
             Id = u.Id;
             Name = u.Name;
             ProfileName = u.Profile.Name;
             AccountName = u.Account.Name;
+            email =  u.email; 
+            alias = u.alias;
+            username = u.username;
+            isActive = u.isActive; 
         
         }
     }
@@ -38,9 +46,9 @@ public with sharing class UsersManagmentController {
             // System.debug(userName);
             if(userName == null){
 
-                CommunityUser = [select Name,Account.Name , Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId )];
+                CommunityUser = [select Name,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId )];
             }else{
-                CommunityUser = [select Name,Account.Name , Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId ) And ((Name Like : ('%'+ userName+'%')) OR (Email Like : ('%'+ userName+'%')))];
+                CommunityUser = [select Name,Account.Name, email, alias, username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId ) And ((Name Like : ('%'+ userName+'%')) OR (Email Like : ('%'+ userName+'%')))];
             }
             List<userWrapper> listW = new List<userWrapper>();
 
@@ -111,13 +119,19 @@ return contactIds;
                             LocaleSidKey = loc,
                             EmailEncodingKey= emlenco,
                             LanguageLocaleKey = lang);
-        insert uss;
         
-        return 'ID : ' +  uss;
+        
+        try {
+            insert uss;
+            return 'ID : ' +  uss;
+        } catch (DmlException e) {
+            System.debug('Dml exception occured : '+ e);
+            return 'error : ' + e;
+        }
     }
     //create many users
     @AuraEnabled
-    public static void createNewUsers(List<User> users){
+    public static String createNewUsers(List<User> users){
         // List to hold created User records
         List<User> createdUsers = new List<User>();
         
@@ -133,9 +147,61 @@ return contactIds;
         // Optionally, insert all User records into the database
         try {
             insert createdUsers;
+            return 'users with Mass created with success';
         } catch (DmlException exe) {
             System.debug('DML exception' + exe);
+            return 'error' + exe;
         }
+    }
+
+        @auraEnabled
+        public static Boolean sendMailUser(String address, String subject, String body) {
+            // Create an email message object
+            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+            String[] toAddresses = new String[] {address};
+            mail.setToAddresses(toAddresses);
+            mail.setSubject(subject);
+            mail.setPlainTextBody(body);
+            // Pass this email message to the built-in sendEmail method 
+            // of the Messaging class
+            Messaging.SendEmailResult[] results = Messaging.sendEmail(
+                                    new Messaging.SingleEmailMessage[] { mail });
+            // Call a helper method to inspect the returned results
+            return inspectResults(results);
+        }
+        // Helper method
+        private static Boolean inspectResults(Messaging.SendEmailResult[] results) {
+            Boolean sendResult = true;
+            // sendEmail returns an array of result objects.
+            // Iterate through the list to inspect results. 
+            // In this class, the methods send only one email, 
+            // so we should have only one result.
+            for (Messaging.SendEmailResult res : results) {
+                if (res.isSuccess()) {
+                    System.debug('Email sent successfully');
+                }
+                else {
+                    sendResult = false;
+                    System.debug('The following errors occurred: ' + res.getErrors());                 
+                }
+            }
+            return sendResult;
+        
+    }
+    //update existing user
+    @AuraEnabled
+    public static String updateUser(User user){
+        // List to hold created User records
+        try {
+            update user;
+            return 'user updated succesfully';
+        } catch (DmlException e) {
+             
+       System.debug('error : '+ e);
+       return 'error : '+ e ;
+        }
+        
+       
     }
     
     

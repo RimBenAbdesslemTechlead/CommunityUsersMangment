@@ -1,2 +1,9 @@
-.THIS {
+.THIS .slds-modal__container {
+    max-width: 50rem;
+}
+
+.THIS .slds-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

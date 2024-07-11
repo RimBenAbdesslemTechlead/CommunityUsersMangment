@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-console */
 /* eslint-disable no-return-assign */
 ({
@@ -12,6 +13,44 @@
         });
 
     $A.enqueueAction(action);
+    },getRowActions: function (cmp, row, doneCallback) {
+        var actions = [];
+        if (row['isActive']) {
+            actions.push(
+                
+                {'label' : 'send mail', 'name' : 'send_mail'},
+                {'label' : 'reset password', 'name' : 'reset_password'},
+                {'label' : 'update' ,'name' : 'update'},
+                {'label': 'Deactivate','iconName': 'utility:block_visitor','name': 'deactivate'}
+                
+            );
+        } else {
+            actions.push(
+                
+                {'label' : 'send mail', 'name' : 'send_mail'},
+                {'label' : 'reset password', 'name' : 'reset_password'},
+                {'label' : 'update' ,'name' : 'update'},
+                {'label': 'Activate','iconName': 'utility:adduser','name': 'activate'}
+                );
+        }
+        // simulate a trip to the server
+        setTimeout($A.getCallback(function () {
+            doneCallback(actions);
+        }), 200);
+    },
+    activateContact: function (cmp, row) {
+        var rows = cmp.get('v.listOfAccounts');
+        var rowIndex = rows.indexOf(row);
+        rows[rowIndex]['isActive'] = true;
+        rows[rowIndex]['active'] = 'Active';
+        cmp.set('v.data', rows);
+    },
+    deactivateContact: function (cmp, row) {
+        var rows = cmp.get('v.listOfAccounts');
+        var rowIndex = rows.indexOf(row);
+        rows[rowIndex]['isActive'] = false;
+        rows[rowIndex]['active'] = 'Inactive';
+        cmp.set('v.data', rows);
     },
 
     allUserName : function(component, userName){
@@ -26,7 +65,7 @@
                     component.set('v.listOfAccounts',response.getReturnValue());
                     
                     this.preparePagination(component, response.getReturnValue());
-                    console.log('success');
+                    console.log('success : ', response.getReturnValue());
                     
                     
                     
@@ -89,5 +128,41 @@
         }
     },
 
-    
+    sendMailHelper: function(component, address, subject, body){
+        var action = component.get("c.sendMailUser");
+        
+        action.setParams(
+            {
+                address : address ,
+                subject : subject ,
+                body    : body ,
+            }
+        )
+        action.setCallback(this, function(response){
+            if (response.getState()==='SUCCESS') {
+                console.log("was mail sent correct? ", response.getReturnValue());
+            }
+            else if (response.getState()==='ERROR') {
+                console.log("was mail sent correct? ", response.getReturnValue());
+            }
+        });
+        $A.enqueueAction(action);
+        },
+        updateUserData : function(component,user) {
+            
+            var action = component.get('c.updateUser');
+            action.setParams({
+                user :user
+            });
+            action.setCallback(this, function(response){
+                if(response.state==='SUCCESS'){
+                   // eslint-disable-next-line no-console
+                console.log("response", response.getReturnValue());
+               }else{
+                   // eslint-disable-next-line no-console
+                   console.log(response.error);
+               }
+            })
+        $A.enqueueAction(action);
+        }
 })
