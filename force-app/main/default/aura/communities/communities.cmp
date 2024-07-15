@@ -41,10 +41,23 @@
     <aura:attribute name="username" type="String"/>
     <aura:attribute name="Id" type="String"/>
 
-        <!-- send email attributes :::::::: -->
-    <!--1)) send email to user popup attribute -->
+    <!-- send email attributes to one user :::::::: -->
+    <!--1)) send email to one user popup attribute -->
     <aura:attribute name="showSendMailPopup" type="Boolean" default="false"/>
     
+    <!-- send email attributes to many users:::::::: -->
+    <!--1)) send email to many user popup attribute -->
+    <aura:attribute name="sendMailManyUsersPopUp_visible" type="Boolean" default="false"/>
+    
+    <!-- actions in mass attributes :::::::: -->
+    <!--1)) handle selected rows attribute -->
+    <aura:attribute name="idsOfAllSelectedRows" type="Object[]"/>
+    <aura:attribute name="selectedRow" type="Object"/>
+    <aura:attribute name="massActionsSelectionVisible" type="Boolean" default="false"/>
+    
+
+
+
     <!-- <lightning:combobox name="progress" label="Status" value="inProgress" placeholder="Select Progress" options="{! v.netList }" onchange="{! c.handleChange }"/> -->
     <lightning:button aura:id="addOneUserBtn" label="Add user"
     onclick="{! c.handleAddOneClick }" />
@@ -53,7 +66,7 @@
 
     <lightning:layout class="slds-grid slds-wrap">
       
-      <lightning:layoutItem size="6" padding="around-small">
+      <lightning:layoutItem size="3" padding="around-small">
         <!--select component for communities-->
         <lightning:select name="select network" label="Networks" required="true" onchange="{! c.handleChange }">
           <option value="" label="Choose community" hidden="true">Choose community</option>
@@ -65,7 +78,26 @@
 
         <!--searching users by names-->
         </lightning:layoutItem>
-      <lightning:layoutItem size="6" padding="around-small">
+    <lightning:layoutItem size="2" padding="around-small">
+
+    </lightning:layoutItem>
+    <lightning:layoutItem size="2" padding="around-small">
+        <aura:if isTrue="{! v.massActionsSelectionVisible}">
+            <lightning:select name="selectProfile" label="Profiles"  aura:id="selectProfile" onchange="{! c.handleMassActionChanged}">
+                                    <option value="" label="Choose Acion" hidden="true">Choose Action</option>
+                                    <option value="sendEmail" text="Send email"></option>
+                                    <option value="resetPassword" text="reset password"/>
+                                    <option value="activate" text="activate"/>
+                                    <option value="disactivate" text="disactivate"/>
+                                 
+            </lightning:select> 
+        </aura:if>
+        
+    </lightning:layoutItem>
+    <lightning:layoutItem size="3" padding="around-small">
+        
+    </lightning:layoutItem>
+      <lightning:layoutItem size="2" padding="around-small">
       <lightning:input aura:id="myinput" type="text"
             value="{! v.textvalue }"  label="Enter some text"
             onchange="{! c.handleInputChange}"
@@ -79,13 +111,15 @@
       
       <!--Data table of all community users-->
       <lightning:layoutItem size="12" padding="around-small">
-        <lightning:datatable keyField="id" data="{!v.paginationList}"
+
+        <lightning:datatable aura:id="datatable" keyField="Id" data="{!v.paginationList}"
                                         columns="{!v.mycolumns}"
-                                        hideCheckboxColumn="true"
                                         onsort="{!c.updateSorting}"
                                         sortedBy="{!v.sortedBy}"
                                         sortedDirection="{!v.sortedDirection}"
-                                        onrowaction="{! c.handleRowAction }"  />
+                                        onrowaction="{! c.handleRowAction }" 
+                                        onrowselection="{! c.rowSelection}"
+                                        />
         </lightning:layoutItem>
       </lightning:layout>
       <div class="slds-align_absolute-center"> 
@@ -145,7 +179,7 @@
                                 <lightning:input aura:id="emlenco" label="Email Encoding" type="text" value="UTF-8"/>
                                 <lightning:input aura:id="lang" label="Language" type="text" value="en_US"/>
 
-                                <lightning:select name="selectContact" label="Contacts"  aura:id="selectContact">
+                                <!-- <lightning:select name="selectContact" label="Contacts"  aura:id="selectContact">
                                     <option value="" label="Choose contact" hidden="true">Choose contact</option>
                                     <aura:iteration items="{!v.contacts}" var="contact">
                                         <option value="{!contact.Id}" text="{!contact.Name}"/>
@@ -156,7 +190,7 @@
                                     <aura:iteration items="{!v.profiles}" var="profile">
                                         <option value="{!profile.Id}" text="{!profile.Name}"/>
                                     </aura:iteration>
-                                </lightning:select>
+                                </lightning:select> -->
 
                                 <lightning:button label="Update user" onclick="{!c.UpdateUser}"/>
                             </lightning:card>
@@ -185,6 +219,31 @@
                                 <lightning:input aura:id="emailSubject" name="Email" label="Subject: " placeholder="set email Subject" type="text"/>
                                 <lightning:textarea aura:id="emailBody" placeholder="set email content" label="email body"/>
                                 <lightning:button label="send email" onclick="{!c.sendMailToUser}"/>
+                            </lightning:card>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <!-- pop up to send mail to many users -->
+    <aura:if isTrue="{!v.sendMailManyUsersPopUp_visible}">
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:button label="close" onclick="{! c.ManyEmailcloseBtnClicked}"/>
+                    <h2 class="slds-text-heading_medium">send email to Many Users</h2>
+                    
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning:layout>
+                        <lightning:layoutItem size="12" padding="around-small">
+                            <lightning:card title="Update User">
+                                <!-- <lightning:input aura:id="ManyEmailAddresses" type="email" label="To: " name="emailAddress" value="{! v.email}"/> -->
+                                <lightning:input aura:id="ManyEmailSubjects" name="subject" label="Subject: " placeholder="set email Subject" type="text"/>
+                                <lightning:textarea aura:id="ManyEmailBodies" placeholder="set email content" label="email body"/>
+                                <lightning:button label="send email" onclick="{!c.sendMailToManyUsers}"/>
                             </lightning:card>
                         </lightning:layoutItem>
                     </lightning:layout>

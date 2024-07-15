@@ -1,3 +1,4 @@
+/* eslint-disable compat/compat */
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
@@ -10,7 +11,7 @@
         var actions = helper.getRowActions.bind(this, component);
         
         component.set('v.mycolumns', [
-            { label: 'Name(lastname)', fieldName: 'Name', type: 'text'},
+            { label: 'Name(lastname)', fieldName: 'Lastname', type: 'text'},
             { label: 'email', fieldName: 'email', type: 'text'},
             { label: 'Profile', fieldName: 'ProfileName', type: 'text'},
             { label: 'Account', fieldName: 'AccountName', type: 'text'},
@@ -40,6 +41,7 @@
         switch (action.name) {
             case 'reset_password':
                 console.log("reset" );
+                helper.resetUserPassword(component, row);
 
             break;
 
@@ -61,7 +63,7 @@
                 rowIndex = rows.indexOf(row);
                 
                 component.set("v.userIndex", (rowIndex+1));
-                component.set("v.lastname", row.Name);
+                component.set("v.lastname", row.Lastname);
                 component.set("v.email", row.email);
                 component.set("v.alias", row.alias);
                 component.set("v.username", row.username);
@@ -69,9 +71,20 @@
                 
                 
             break;
+            case 'deactivate':
+                console.log('disactivate');
+                helper.deactivateUser(component, row);
+
+
+            break;
+            case 'activate':
+                
+                helper.activateUser(component, row);
+            break;
 
             default : 
-                console.log("delete");
+                console.log("switch default action");
+                
             break;
         }
 },
@@ -89,15 +102,33 @@
         cmp.set("v.sortedDirection", sortDirection);
         helper.sortData(cmp, fieldName, sortDirection);
     },
+    rowSelection : function(component, event) {
+        
+        var rowselected = event.getParam('selectedRows');
+        var idsOfAllSelectedRows = component.get("v.idsOfAllSelectedRows"); 
+            idsOfAllSelectedRows.push(rowselected[rowselected.length - 1].Id)
+        
+        console.log('elements : ', idsOfAllSelectedRows);
+        if(idsOfAllSelectedRows.length >1){
+            
+            component.set("v.massActionsSelectionVisible", true)
+        }
+
+    },
      
-    handleNext: function(component, event, helper){        
+    handleNext: function(component, event, helper){
+        // var idsOfAllSelectedRows = component.get("v.idsOfAllSelectedRows");        
         component.set("v.currentPageNumber", component.get("v.currentPageNumber") + 1);
         helper.setPaginateData(component);
+
+        
     },
      
     handlePrevious: function(component, event, helper){
+        // var idsOfAllSelectedRows = component.get("v.idsOfAllSelectedRows");  
         component.set("v.currentPageNumber", component.get("v.currentPageNumber") - 1);
         helper.setPaginateData(component);
+        
     },
     
     onFirst: function(component, event, helper) {        
@@ -133,16 +164,7 @@
         helper.sendMailHelper(component, address, subject , body);
     },
     UpdateUser : function(component, event, helper){
-        // var lastname = component.find('lastname').get("v.value");
-        // var email = component.find('email').get("v.value");
-        // var alias = component.find('alias').get("v.value");
-        // var username = component.find('username').get("v.value");
-        // var timeZone = component.find("tz").get("v.value");
-        // var locale_hour = component.find('loc').get("v.value");
-        // var emailEncoding = component.find('emlenco').get("v.value");
-        // var language = component.find('lang').get("v.value");
-        // var selectContact = component.find('selectContact').get("v.value");
-        // var selectProfile = component.find("selectProfile").get("v.value");
+
         var user = {
             Id : component.get("v.Id"),
             LastName: component.find('lastname').get("v.value"),
@@ -156,5 +178,41 @@
 
         }
         helper.updateUserData(component,user);
+    },
+    handleMassActionChanged : function(component, event, helper){
+        var choosenValue = event.getSource().get("v.value");
+        console.log("chosen val : ", choosenValue);
+        switch(choosenValue){
+            case 'sendEmail':
+            component.set("v.sendMailManyUsersPopUp_visible", true)
+                break;
+            case 'resetPassword' :
+                helper.resetManyPasswords(component, component.get("v.idsOfAllSelectedRows"));
+                break;
+                case 'activate' :
+                helper.activateManyUsers(component, component.get("v.idsOfAllSelectedRows"));
+                break;
+                case 'disactivate' :
+                helper.disactivateManyUsers(component, component.get("v.idsOfAllSelectedRows"));
+                break;
+            default:
+                break;
+        }
+    },
+    sendMailToManyUsers : function(component, event, helper){
+        console.log("send mail to namy user toggled");
+        var ids = component.get("v.idsOfAllSelectedRows");
+        var subject = component.find("ManyEmailSubjects").get("v.value");
+        var body = component.find("ManyEmailBodies").get("v.value");
+        
+        helper.sendManyMails(component, ids,subject, body)
+        component.set("v.sendMailManyUsersPopUp_visible", false)
+        
+        component.find("datatable").set("v.selectedRows",[]);
+
+    },
+    ManyEmailcloseBtnClicked : function(cmp){
+        cmp.set("v.sendMailManyUsersPopUp_visible", false);
     }
+    
 })

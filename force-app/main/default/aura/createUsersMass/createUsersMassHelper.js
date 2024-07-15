@@ -43,6 +43,13 @@
         )
         action.setCallback(this, function(response){
             console.log("response.state() : ", response.getState());
+            if(response.getState()==='SUCCESS') {
+                console.log('users created sucessfully');
+                window.open(window.location.origin + "/c/communitiesApp.app","_self");
+            }
+            else if(response.getState()==='ERROR') {
+                console.log('error while creating users');
+            }
         });
         $A.enqueueAction(action);
 

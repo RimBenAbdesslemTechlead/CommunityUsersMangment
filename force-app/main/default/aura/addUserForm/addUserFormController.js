@@ -21,5 +21,6 @@
         console.log('lastname c', lastname, email, alias, username, tz,loc,emlenco, lang, 'conta------',contactId,'prf id' , ProfileId );
 
         helper.createNewUser(component,lastname, email, alias, username, tz,loc,emlenco, lang, contactId, ProfileId);
-    }
+    },
+    
 })

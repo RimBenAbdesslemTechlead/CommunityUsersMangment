@@ -3,7 +3,7 @@ public with sharing class UsersManagmentController {
     //custom class
     public class UserWrapper {
         @AuraEnabled public String Id { get; set; }
-        @AuraEnabled public String Name { get; set; }
+        @AuraEnabled public String Lastname { get; set; }
         @AuraEnabled public String ProfileName { get; set; }
         @AuraEnabled public String AccountName { get; set; }
         @AuraEnabled public String email { get; set; }
@@ -13,7 +13,7 @@ public with sharing class UsersManagmentController {
         
         public UserWrapper(User u) {
             Id = u.Id;
-            Name = u.Name;
+            Lastname = u.LastName;
             ProfileName = u.Profile.Name;
             AccountName = u.Account.Name;
             email =  u.email; 
@@ -46,9 +46,9 @@ public with sharing class UsersManagmentController {
             // System.debug(userName);
             if(userName == null){
 
-                CommunityUser = [select Name,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId )];
+                CommunityUser = [select Lastname,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId )];
             }else{
-                CommunityUser = [select Name,Account.Name, email, alias, username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId ) And ((Name Like : ('%'+ userName+'%')) OR (Email Like : ('%'+ userName+'%')))];
+                CommunityUser = [select LastName,Account.Name, email, alias, username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId ) And ((Name Like : ('%'+ userName+'%')) OR (Email Like : ('%'+ userName+'%')))];
             }
             List<userWrapper> listW = new List<userWrapper>();
 
@@ -109,12 +109,13 @@ return contactIds;
     public static String getNewUser(String name,String email,String alias,String username,String tz,String loc,String emlenco,String lang, String contactId, String profileId){
 
         // System.debug('profile : ' + profileId);
-        User uss = new User(lastName = name,
-                            email = email,
-                            alias = alias,
+        User uss = new User(
+                            LastName = name,
+                            Email = email,
+                            Alias = alias,
                             ProfileId = profileId,
                             ContactId =contactId,
-                            username= username,
+                            Username= username,
                             TimeZoneSidKey = tz,
                             LocaleSidKey = loc,
                             EmailEncodingKey= emlenco,
@@ -155,39 +156,21 @@ return contactIds;
     }
 
         @auraEnabled
-        public static Boolean sendMailUser(String address, String subject, String body) {
-            // Create an email message object
-            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-            String[] toAddresses = new String[] {address};
-            mail.setToAddresses(toAddresses);
-            mail.setSubject(subject);
-            mail.setPlainTextBody(body);
-            // Pass this email message to the built-in sendEmail method 
-            // of the Messaging class
-            Messaging.SendEmailResult[] results = Messaging.sendEmail(
-                                    new Messaging.SingleEmailMessage[] { mail });
-            // Call a helper method to inspect the returned results
-            return inspectResults(results);
+        public static String sendMailUser(String address, String subject, String body) {
+            try {
+             EmailManager.sendMail(address, subject, body);
+                return 'Mail sent with success';
+            } catch (EmailException e) {
+                System.debug('exception : '+ e);
+                return 'Error : '+ e;
+            }
+            
+            
+           
+
         }
         // Helper method
-        private static Boolean inspectResults(Messaging.SendEmailResult[] results) {
-            Boolean sendResult = true;
-            // sendEmail returns an array of result objects.
-            // Iterate through the list to inspect results. 
-            // In this class, the methods send only one email, 
-            // so we should have only one result.
-            for (Messaging.SendEmailResult res : results) {
-                if (res.isSuccess()) {
-                    System.debug('Email sent successfully');
-                }
-                else {
-                    sendResult = false;
-                    System.debug('The following errors occurred: ' + res.getErrors());                 
-                }
-            }
-            return sendResult;
         
-    }
     //update existing user
     @AuraEnabled
     public static String updateUser(User user){
@@ -202,6 +185,101 @@ return contactIds;
         }
         
        
+    }
+    @auraEnabled
+    public static String desactivateSelectedUser(String userId){
+        User u = [select name, isActive from user where id =: userId];
+        System.debug('users is'+ u);
+        try {
+            u.IsActive = false;
+            update u;
+            return 'user desactivated succesfully';
+        } catch (DmlException e) {
+            return 'error in desactivation : '+ e;
+        }
+        
+    }
+
+    @auraEnabled
+    public static String activateSelectedUser(String userId){
+        User u = [select name, isActive from user where id =: userId];
+        System.debug('users is'+ u);
+        try {
+            u.IsActive = true;
+            update u;
+            return 'user activated succesfully';
+        } catch (DmlException e) {
+            return 'error in activation : '+ e;
+        }
+        
+    }
+
+    @AuraEnabled
+    public static void resetPassword(String userId){
+      System.resetPassword(userId, true);
+    
+    }
+
+
+    @auraEnabled
+    public static String sendEmailToManyUsers(List<String> ids,String subject,String body){
+        
+        List<user> userWithIds = [select Email from User where Id IN :ids];
+        for(User u : userWithIds){
+            // System.debug('email : '+U.Email+ ' subject : '+ subject+ ' body : '+body);
+            try {
+                
+                EmailManager.sendMail(U.Email, subject, body);
+
+            } catch (EmailException e) {
+                System.debug('error : '+ e);
+                return 'error  : '+ e;
+            }
+                
+        }
+        
+        return 'success';
+    }
+    @auraEnabled
+    public static String resetManyPasswords(List<String> ids){
+        List<User> activeUsersPasswords = [select Id from User where IsActive=TRUE And Id in : ids];
+        if (activeUsersPasswords.size()==0) {
+            return 'can\'t reset password all users are innactive';
+        }
+        else{
+            for(User u : activeUsersPasswords){
+                System.resetPassword(U.Id, true);
+                
+            }
+            return 'users passwords are resetted for active users';
+        }
+    }
+
+    @auraEnabled
+    public static String activateManyUsersApex(List<String> ids){
+        List<User> inactiveUsersPasswords = [select Id from User where IsActive=FALSE And Id in : ids];
+        for (User u : inactiveUsersPasswords) {
+            u.IsActive = True;
+        }
+        try {
+            update inactiveUsersPasswords;
+            return 'Success in users activation many users';
+        } catch (DmlException e) {
+            return 'error activating many users' + e;
+        }
+    }
+    @auraEnabled
+    public static String disactivateManyUsersApex(List<String> ids){
+        List<User> activeUsersPasswords = [select Id from User where IsActive=TRUE And Id in : ids];
+        for (User u : activeUsersPasswords) {
+            u.IsActive = False;
+        }
+        try {
+            update activeUsersPasswords;
+            return 'Success in users disactivation many users';
+        } catch (DmlException e) {
+            return 'error disactivating many users' + e;
+        }
     }
     
     
