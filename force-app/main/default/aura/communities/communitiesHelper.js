@@ -1,3 +1,5 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable no-redeclare */
 /* eslint-disable no-unused-vars */
 /* eslint-disable dot-notation */
 /* eslint-disable no-console */
@@ -67,6 +69,7 @@
             action.setCallback(this, function(response){
                 if(response.getState()==='SUCCESS'){
                     component.set('v.listOfAccounts',response.getReturnValue());
+                    component.set('v.AllUsers',response.getReturnValue())
                     
                     this.preparePagination(component, response.getReturnValue());
                     console.log('success : ', response.getReturnValue());
@@ -366,4 +369,69 @@
             })
             $A.enqueueAction(action);
         },
+        FilterString : function(component, prop){
+            var data = component.get("v.listOfAccounts");
+            var operation   = component.find("opSelect").get("v.value")
+            var value  = component.find("valSelect").get("v.value")
+            console.log("from filterByLicense : ",operation, value);
+            
+            switch(operation.toLowerCase()){
+                case 'equals':
+                    var filtredequals = data.filter(function(element){
+                        return element[prop] ===value;
+                    })
+                    component.set("v.listOfAccounts", filtredequals);
+                    component.set("v.paginationList", filtredequals.slice(0,10));
+                    
+                break;
+                case 'contains':
+                    var filterdcontains = data.filter(function(element){
+                        return (element[prop]).includes(value)
+                    })
+                    component.set("v.listOfAccounts", filterdcontains);
+                    component.set("v.paginationList", filterdcontains.slice(0,10));
+                break;
+                case 'startswith':
+                    var filtredStartsWith = data.filter(function(element, index){
+                       
+                        return (element[prop]).startsWith(value)
+                    })
+                    component.set("v.listOfAccounts", filtredStartsWith);
+                    component.set("v.paginationList", filtredStartsWith.slice(0,10));
+                break;
+                case 'not equal to':
+                    var  filtredNotEqual = data.filter(function(element, index){
+                        // console.log("element : ", index , " stw : ",(element[prop]).startsWith(value));
+                        return element[prop] !== value;
+                    })
+                    component.set("v.listOfAccounts", filtredNotEqual);
+                    component.set("v.paginationList", filtredNotEqual.slice(0,10));
+                break;
+                default :
+                var filtredNotContain = component.get("v.listOfAccounts").filter(function(element){
+                    return !element[prop].includes(value)
+                })
+                component.set("v.listOfAccounts", filtredNotContain);
+                component.set("v.paginationList", filtredNotContain.slice(0,10));
+                break;
+            }
+            
+        },
+        filterStatus : function(component){
+            var value = component.find("valSelect").get("v.value")
+            var filteredWithStatus = component.get("v.listOfAccounts").filter(function(element){
+                if(value === 'true' && element["isActive"] === true){
+                    return true
+                }
+                else if(value === 'false' && element["isActive"] === false){
+                    return true
+                }
+                
+                    return false
+                
+            })
+            console.log("isActive : ", value);
+            component.set("v.listOfAccounts", filteredWithStatus);
+            component.set("v.paginationList", filteredWithStatus.slice(0,10));
+        }
 })

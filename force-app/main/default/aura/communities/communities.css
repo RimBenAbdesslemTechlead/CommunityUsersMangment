@@ -5,5 +5,24 @@
 .THIS .slds-modal {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+}
+.THIS .buttonContainer {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+.THIS .spacedButton {
+    margin-right: 10px; 
+}
+.THIS .pageTitleContainer{
+    padding: 15px;
+    background-color: white;
+}
+
+.THIS .Pagetitle{
+    color : rgb(159, 0, 199);
+    font-size: 30px;
+    font-weight: 700;
 }

@@ -10,6 +10,7 @@ public with sharing class UsersManagmentController {
         @AuraEnabled public String alias { get; set; }
         @AuraEnabled public String username { get; set; }
         @AuraEnabled public Boolean isActive {get; set;}
+        @AuraEnabled public String License {get; set;}
         
         public UserWrapper(User u) {
             Id = u.Id;
@@ -20,6 +21,7 @@ public with sharing class UsersManagmentController {
             alias = u.alias;
             username = u.username;
             isActive = u.isActive; 
+            License = u.Profile.UserLicense.Name;
         
         }
     }
@@ -46,9 +48,9 @@ public with sharing class UsersManagmentController {
             // System.debug(userName);
             if(userName == null){
 
-                CommunityUser = [select Lastname,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId )];
+                CommunityUser = [select Profile.UserLicense.Name,  Lastname,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId )];
             }else{
-                CommunityUser = [select LastName,Account.Name, email, alias, username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId ) And ((Name Like : ('%'+ userName+'%')) OR (Email Like : ('%'+ userName+'%')))];
+                CommunityUser = [select Profile.UserLicense.Name, LastName,Account.Name, email, alias, username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User') and ID in (select MemberId from networkMember where networkId =:networkId ) And ((Name Like : ('%'+ userName+'%')) OR (Email Like : ('%'+ userName+'%')))];
             }
             List<userWrapper> listW = new List<userWrapper>();
 

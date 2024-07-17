@@ -22,6 +22,7 @@
            
            
         ]);
+
     },
     UpdatecloseBtnClicked : function(component){
         
@@ -213,6 +214,54 @@
     },
     ManyEmailcloseBtnClicked : function(cmp){
         cmp.set("v.sendMailManyUsersPopUp_visible", false);
-    }
-    
+    },
+    isconButtonClicked : function(component){
+        if(component.get("v.AllUsers").length !==0) component.set("v.datatableWidth", 9);
+    },
+    handleAddFilterClicked : function () {
+        console.log("add filter");
+    },
+    deleteFilerClicked : function(){
+        console.log('cancel filter');
+    },
+    //this function set the operations possibles for each property
+    propertySelectionChanged : function(component,event){
+        var prop = event.getSource().get("v.value");
+        var propsValuesList = component.get("v.selectionPropValue");
+        var operationsFound = propsValuesList.some(function(element){
+            if(element.name === prop){
+                console.log('ops : ', element.operations);
+                component.set("v.operationsOfselectedProperty", element.operations);
+                return true;
+            }
+            return false;
+        })
+        
+    },
+    deleteFilters : function(component){
+        component.set("v.datatableWidth", 12)
+        var allUsers = component.get("v.AllUsers");
+        component.set("v.listOfAccounts", allUsers)
+        component.set("v.paginationList", allUsers.slice(0,10));
+    },
+    applyFilters :function(component, event, helper){
+        var prop = component.find("propSelect").get("v.value")
+        
+        switch(prop){
+            case 'License':
+                helper.FilterString(component, prop)
+                break;
+                case 'ProfileName':
+                    helper.FilterString(component, prop)
+                break;
+                case 'AccountName':
+                    helper.FilterString(component, prop)
+                break;
+                default:
+                    helper.filterStatus(component)
+                break;
+        }
+    },
+        
+
 })
