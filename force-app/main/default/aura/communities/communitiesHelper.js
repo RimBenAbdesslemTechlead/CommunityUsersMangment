@@ -4,7 +4,30 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-console */
 /* eslint-disable no-return-assign */
-({
+({getAllUsersOfAllCommunities : function(component){
+     //get the comunities from the apex class
+     var action = component.get("c.getAllCommunitiesUsers");
+     action.setCallback(this,function(response){
+        if(response.getState()==='SUCCESS'){
+            component.set('v.listOfAccounts',response.getReturnValue());
+            component.set('v.AllUsers',response.getReturnValue())
+            
+            this.preparePagination(component, response.getReturnValue());
+            console.log('success : ', response.getReturnValue());
+            
+            
+            
+        }
+        else if (response.getState() === "ERROR") {
+            var errors = response.getError();
+            // eslint-disable-next-line no-console
+            console.error('errors :', errors);
+            
+        }
+     });
+
+ $A.enqueueAction(action);
+},
     allcommunities : function(component) {
         //get the comunities from the apex class
         var action = component.get("c.getCommunities");

@@ -4,37 +4,40 @@
     <aura:attribute name="textvalue" type="String" default=""/>
     <aura:attribute name="contacts" type="Contact[]"/>
     <aura:attribute name="profiles" type="Profile[]"/>
-
-    <lightning:card iconName="standard:user" title="Add a User">
         
-            <lightning:layout>
-                <lightning:layoutItem size="6" padding="around-small">
-                    <lightning:input aura:id="lastname" type="text" label="Last Name" name="lastName"/>
-                    <lightning:input  aura:id="email" name="Email" label="Emails" type="email"/>
-                    <lightning:input  aura:id="alias" label="Alia" type="text" />
-                    <lightning:input  aura:id="username" label="Username" type="text" />
-                    <lightning:input  aura:id="tz" label="TimeZone" type="text" value="Africa/Tunis"/>
-                    <lightning:input  aura:id="loc" label="Locale" type="text" value="ar_TN"/>
-                    <lightning:input  aura:id="emlenco" label="EmailEncoding" type="text" value="UTF-8"/>
-                    <lightning:input  aura:id="lang" label="lang" type="text" value="en_US"/>
+                <lightning:card iconName="standard:user" title="Add a User">
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small">
+                        <lightning:input class="wi" aura:id="lastname" type="text" label="Last Name" name="lastName"/>
+                        <lightning:input  aura:id="email" name="Email" label="Emails" type="email"/>
+                        <lightning:input  aura:id="alias" label="Alia" type="text" />
+                        <lightning:input  aura:id="username" label="Username" type="text" />
+                        <lightning:input  aura:id="tz" label="TimeZone" type="text" value="Africa/Tunis"/>
+                        <lightning:input  aura:id="loc" label="Locale" type="text" value="ar_TN"/>
+                        <lightning:input  aura:id="emlenco" label="EmailEncoding" type="text" value="UTF-8"/>
+                        <lightning:input  aura:id="lang" label="lang" type="text" value="en_US"/>
 
-                    <lightning:select name="select contact" label="contacts" required="true" aura:id="selectContact">
-                        <option value="" label="contacts" hidden="true">Choose contact</option>
-                        <aura:iteration items="{!v.contacts}" var="contact">
-                            <option value="{!contact.Id}" text="{!contact.Name}" />
-                        </aura:iteration>
-                    </lightning:select>
-                    <lightning:select name="select profile" label="profiles" required="true" aura:id="selectProfile" >
-                        <option value="" label="profiles" hidden="true">Choose profile</option>
-                        <aura:iteration items="{!v.profiles}" var="profile">
-                            <option value="{!profile.Id}" text="{!profile.Name}" />
-                        </aura:iteration>
-                    </lightning:select>
+                        <lightning:select name="select contact" label="contacts" required="true" aura:id="selectContact">
+                            <option value="" label="contacts" hidden="true">Choose contact</option>
+                            <aura:iteration items="{!v.contacts}" var="contact">
+                                <option value="{!contact.Id}" text="{!contact.Name}" />
+                            </aura:iteration>
+                        </lightning:select>
+                        <lightning:select name="select profile" label="profiles" required="true" aura:id="selectProfile" >
+                            <option value="" label="profiles" hidden="true">Choose profile</option>
+                            <aura:iteration items="{!v.profiles}" var="profile">
+                                <option value="{!profile.Id}" text="{!profile.Name}" />
+                            </aura:iteration>
+                        </lightning:select>
 
 
 
-                    <lightning:button label="create" onclick="{! c.createUser}"></lightning:button>
-                </lightning:layoutItem>  
-            </lightning:layout>
-    </lightning:card>
+                        <div class="CreateCancelContainer">
+                            <lightning:button  label="create" variant="brand"  onclick="{! c.createUser}"></lightning:button>
+                            <lightning:button  label="cancel" variant="destructive"  onclick="{! c.cancelUserCreation}"></lightning:button>
+                        </div>
+                    </lightning:layoutItem>  
+                </lightning:layout>
+            </lightning:card>
+            
 </aura:component>

@@ -23,6 +23,8 @@
            
         ]);
 
+        helper.getAllUsersOfAllCommunities(component);
+
     },
     UpdatecloseBtnClicked : function(component){
         
@@ -56,6 +58,9 @@
                 component.set("v.email", row.email);
                 component.set("v.alias", row.alias);
                 component.set("v.username", row.username);
+                
+
+                
             break;
 
             case 'update':
@@ -69,7 +74,7 @@
                 component.set("v.alias", row.alias);
                 component.set("v.username", row.username);
                 component.set("v.Id", row.Id);
-                
+                component.set("v.ProfileName", row.ProfileName);
                 
             break;
             case 'deactivate':

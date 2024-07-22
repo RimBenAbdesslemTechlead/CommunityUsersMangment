@@ -8,13 +8,15 @@
     <aura:attribute name="addUserButtonActive" type="Boolean"  default="true"/>
     <aura:attribute name="NbUsers" type="Integer" default="1"/>
     <aura:attribute name="isLoading" type="Boolean" default="true"/>
-    <div>add as many forms as ou need to create users in mass</div>
+    
     <lightning:layout  multipleRows="true" horizontalAlign="center">
         <lightning:layoutItem size="6" >
             
         {! v.body}
-        <lightning:button label="add other users" aura:id="addNewUser" onclick="{! c.handleNewUserClick}" disabled="{! !v.addUserButtonActive}" />
-        <lightning:button label="create users" aura:id="createUsersButton" onclick="{! c.createUsersMass}"/>
+        <div class="btns">
+            <lightning:button label="add other users" variant="brand" aura:id="addNewUser" onclick="{! c.handleNewUserClick}" disabled="{! !v.addUserButtonActive}" />
+            <lightning:button label="create users" variant="brand" aura:id="createUsersButton" onclick="{! c.createUsersMass}"/>
+        </div>
         <aura:if isTrue="{! v.isLoading}">
                 <div>
                     Loading form...

@@ -42,6 +42,36 @@ public with sharing class UsersManagmentController {
     }
 
     @AuraEnabled
+    public static List<UserWrapper> getAllCommunitiesUsers() {
+        // Get all active communities
+        List<Network> communities = [SELECT Id, Name FROM Network WHERE Status = 'Live'];
+
+        // Initialize a map to hold unique users
+        Map<Id, UserWrapper> uniqueUsersMap = new Map<Id, UserWrapper>();
+
+        // Loop through each community and get the users
+        for (Network community : communities) {
+            // Query to get user IDs for the current community
+            List<NetworkMember> communityMembers = [SELECT MemberId FROM NetworkMember WHERE NetworkId = :community.Id];
+            // Add the user IDs to the map
+            for (NetworkMember member : communityMembers) {
+                uniqueUsersMap.put(member.MemberId, null);
+            }
+        }
+
+        // Query to get unique user details based on the collected IDs
+        List<User> uniqueUsers = [SELECT Profile.UserLicense.Name,  Lastname,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name FROM User WHERE Id IN :uniqueUsersMap.keySet()];
+
+        // Update the map with user details
+        for (User user : uniqueUsers) {
+            uniqueUsersMap.put(user.Id, new UserWrapper(user));
+        }
+        System.debug('users : '+ uniqueUsersMap.values());
+        // Return the list of unique users
+        return uniqueUsersMap.values();
+    }
+
+    @AuraEnabled
     public static List<UserWrapper> getCommunityUserByProfiles(String networkId, String userName){
         try {
             List<User> CommunityUser = new List<User>();

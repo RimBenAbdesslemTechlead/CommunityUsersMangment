@@ -1,0 +1,23 @@
+<aura:component>
+    <div>
+        <div  class="ssa">
+            <div  class="salesforceCommunity">
+                <!-- Use the $Resource global variable to reference the static resource -->
+                <img class="imageLogo" src="{!$Resource.SalesforceLogoResource}" alt="Salesforce Logo" />
+                <div class="communityText">Communities</div>
+            </div>
+            <div class="AdminLinks">
+                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/c/communitiesApp.app#/">Home</a>
+                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Org setup</a>
+                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Dashboards</a>
+                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Web to case</a>
+            </div>
+            <div class="salesforceCommunity Admin">
+                <!-- Use the $Resource global variable to reference the static resource -->
+                <lightning:avatar variant="circle" src="{!$Resource.AdminImage}" initials="SJ" fallbackIconName="standard:person_account" alternativeText="Sarah Jones" size="large" class="slds-m-right_small"/>
+                <div class="username">Ahmed Abbassi</div>
+                <lightning:buttonIcon iconName="utility:down" variant="bare" onclick="{! c.handleClickBtnIcon }" alternativeText="Settings" title="Settings" />
+            </div>
+        </div>
+    </div>
+</aura:component>	

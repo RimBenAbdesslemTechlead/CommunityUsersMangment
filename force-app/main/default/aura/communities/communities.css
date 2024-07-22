@@ -22,7 +22,41 @@
 }
 
 .THIS .Pagetitle{
-    color : rgb(159, 0, 199);
+    color : rgb(0, 0, 0);
     font-size: 30px;
     font-weight: 700;
+    margin-bottom: 20px;
+}
+.THIS .communitiesSelect {
+    margin-top: 20px;
+}
+.THIS .filterIconContainer {
+    display: flex;
+    justify-content: flex-end;
+}
+.THIS .slds-button {
+    /* width: fit-content; */
+    align-self: flex-end;
+}
+.THIS .deleteBtn {
+    background-color: rgb(240, 60, 60);
+    border: none;
+}
+.THIS .deleteBtn:hover {
+    background-color: rgb(240, 48, 48);
+}
+
+.THIS .slds-modal__header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100px;
+}
+.THIS .slds-textarea {
+    height: 150px;
+    margin-bottom: 10px;
+}
+.THIS .updateUserButton {
+    margin-top: 20px;
+    
 }

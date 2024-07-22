@@ -1,0 +1,53 @@
+
+.THIS .imageLogo {
+    width: 100px;
+    
+    
+}
+.THIS {
+    background-color: rgb(198, 217, 249);
+
+}
+.THIS .ssa {
+
+    display: flex ;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    margin: auto;
+}
+
+.THIS .salesforceCommunity {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    
+}
+
+.THIS .AdminLinks {
+width: 30%;
+display: flex;
+justify-content: space-around;
+align-items: center;
+}
+.THIS .AdminLinks>a{
+    font-size: 16px;
+    font-weight: 700;
+    color: black;
+}
+
+.THIS .communityText{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 23px;
+    font-weight: semi-bold;
+}
+.THIS .username {
+    font-size: 15px;
+    font-weight: 600;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.THIS .Admin{
+    width: fit-content;
+}

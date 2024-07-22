@@ -1,2 +1,24 @@
-.THIS {
+.THIS .formContainer {
+    width: 50%;
+    margin: auto;
+}
+
+.THIS .slds-p-around_small {
+    width: 90%;
+    margin: auto;
+}
+.THIS .CreateCancelContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.THIS .createUserHeading {
+    font-size: 30px;
+    font-weight: 600;
+}
+.THIS .headingContainer {
+    width: 80%;
+    margin: 20px;
+    margin-left: auto;
+    margin-right: auto;
 }

@@ -1,2 +1,11 @@
 .THIS {
 }
+
+.THIS .slds-button {
+    margin-top: 10px;
+}
+
+
+.THIS .formContainer {
+    margin-top: 20px;
+}

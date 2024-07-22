@@ -41,6 +41,7 @@
     <aura:attribute name="alias" type="String"/>
     <aura:attribute name="username" type="String"/>
     <aura:attribute name="Id" type="String"/>
+    <aura:attribute name="ProfileName" type="String"/>
 
     <!-- send email attributes to one user :::::::: -->
     <!--1)) send email to one user popup attribute -->
@@ -80,7 +81,7 @@
 
         <lightning:layout>  
             <lightning:layoutItem size="2">
-                 <div>
+                 <div class="communitiesSelect">
                     <!--select component for communities-->
                     <lightning:select name="select network" label="Networks" required="true" onchange="{! c.handleChange }">
                         <option value="" label="Choose community" hidden="true">Choose community</option>
@@ -103,9 +104,9 @@
                 </lightning:layoutItem>
                 <lightning:layoutItem>
                     <div class="flex-item"><!-- <lightning:combobox name="progress" label="Status" value="inProgress" placeholder="Select Progress" options="{! v.netList }" onchange="{! c.handleChange }"/> -->
-                        <lightning:button aura:id="addOneUserBtn" label="Add user"
+                        <lightning:button variant="brand" aura:id="addOneUserBtn" label="Add user"
                         onclick="{! c.handleAddOneClick }" />
-                        <lightning:button label="add many users" aura:id="addOneUserBtn"
+                        <lightning:button variant="brand" label="add many users" aura:id="addOneUserBtn"
                         onclick="{! c.handleAddManyClick}" />
                     
                         <lightning:layout class="slds-grid slds-wrap">
@@ -132,8 +133,10 @@
                                 
                                 
                             </lightning:layoutItem>
-                            <lightning:layoutItem size="2" padding="around-small">
-                                <lightning:buttonIcon iconName="utility:filterList" variant="brand" onclick="{! c.isconButtonClicked }" alternativeText="Settings" title="Settings" />
+                            <lightning:layoutItem size="3" padding="around-small">
+                                <div class="filterIconContainer">
+                                    <lightning:buttonIcon iconName="utility:filterList" variant="brand" onclick="{! c.isconButtonClicked }" alternativeText="Settings" title="Settings" />
+                                </div>
                             </lightning:layoutItem>
                     
                     
@@ -229,7 +232,8 @@
                     
                                     <!-- Modal/Popup Header -->
                                     <header class="slds-modal__header">
-                                        <lightning:button label="close" onclick="{! c.UpdatecloseBtnClicked}"/>
+                                        
+                                        <lightning:buttonIcon iconName="utility:close" variant="brand" alternativeText="Settings" title="Settings" onclick="{! c.UpdatecloseBtnClicked}" class="slds-button deleteBtn"/>
                                         <h2 class="slds-text-heading_medium">Update User({! v.userIndex}) : {! v.lastname}</h2>
                                         
                                     </header>
@@ -246,7 +250,7 @@
                                                     <lightning:input aura:id="loc" label="Locale" type="text" value="ar_TN"/>
                                                     <lightning:input aura:id="emlenco" label="Email Encoding" type="text" value="UTF-8"/>
                                                     <lightning:input aura:id="lang" label="Language" type="text" value="en_US"/>
-                    
+                                                    <lightning:input label="profile" type="text" value="{! v.ProfileName}" disabled="true"/>
                                                     <!-- <lightning:select name="selectContact" label="Contacts"  aura:id="selectContact">
                                                         <option value="" label="Choose contact" hidden="true">Choose contact</option>
                                                         <aura:iteration items="{!v.contacts}" var="contact">
@@ -259,8 +263,10 @@
                                                             <option value="{!profile.Id}" text="{!profile.Name}"/>
                                                         </aura:iteration>
                                                     </lightning:select> -->
-                    
-                                                    <lightning:button label="Update user" onclick="{!c.UpdateUser}"/>
+                                                    
+                                                    <div class="updateUserButton">
+                                                        <lightning:button variant="brand" label="Update user" onclick="{!c.UpdateUser}"/>
+                                                    </div>
                                                 </lightning:card>
                                             </lightning:layoutItem>
                                         </lightning:layout>
@@ -275,18 +281,18 @@
                             <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
                                 <div class="slds-modal__container">
                                     <header class="slds-modal__header">
-                                        <lightning:button label="close" onclick="{! c.emailcloseBtnClicked}"/>
+                                        <lightning:buttonIcon iconName="utility:close" variant="brand" alternativeText="Settings" title="Settings" onclick="{! c.emailcloseBtnClicked}" class="slds-button deleteBtn"/>
                                         <h2 class="slds-text-heading_medium">send email to User({! v.userIndex}) : {! v.lastname}</h2>
                                         
                                     </header>
                                     <div class="slds-modal__content slds-p-around_medium">
                                         <lightning:layout>
                                             <lightning:layoutItem size="12" padding="around-small">
-                                                <lightning:card title="Update User">
+                                                <lightning:card title="Send Email">
                                                     <lightning:input aura:id="emailAddress" type="email" label="To: " name="emailAddress" value="{! v.email}"/>
                                                     <lightning:input aura:id="emailSubject" name="Email" label="Subject: " placeholder="set email Subject" type="text"/>
                                                     <lightning:textarea aura:id="emailBody" placeholder="set email content" label="email body"/>
-                                                    <lightning:button label="send email" onclick="{!c.sendMailToUser}"/>
+                                                    <lightning:button variant="brand" label="send email" onclick="{!c.sendMailToUser}"/>
                                                 </lightning:card>
                                             </lightning:layoutItem>
                                         </lightning:layout>
@@ -300,18 +306,19 @@
                             <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
                                 <div class="slds-modal__container">
                                     <header class="slds-modal__header">
-                                        <lightning:button label="close" onclick="{! c.ManyEmailcloseBtnClicked}"/>
+                                        <lightning:buttonIcon iconName="utility:close" variant="brand" alternativeText="Settings" title="Settings" onclick="{! c.ManyEmailcloseBtnClicked}" class="slds-button deleteBtn"/>
+                                        
                                         <h2 class="slds-text-heading_medium">send email to Many Users</h2>
                                         
                                     </header>
                                     <div class="slds-modal__content slds-p-around_medium">
                                         <lightning:layout>
                                             <lightning:layoutItem size="12" padding="around-small">
-                                                <lightning:card title="Update User">
+                                                <lightning:card title="Send Email">
                                                     <!-- <lightning:input aura:id="ManyEmailAddresses" type="email" label="To: " name="emailAddress" value="{! v.email}"/> -->
                                                     <lightning:input aura:id="ManyEmailSubjects" name="subject" label="Subject: " placeholder="set email Subject" type="text"/>
                                                     <lightning:textarea aura:id="ManyEmailBodies" placeholder="set email content" label="email body"/>
-                                                    <lightning:button label="send email" onclick="{!c.sendMailToManyUsers}"/>
+                                                    <lightning:button variant="brand" label="send email" onclick="{!c.sendMailToManyUsers}"/>
                                                 </lightning:card>
                                             </lightning:layoutItem>
                                         </lightning:layout>

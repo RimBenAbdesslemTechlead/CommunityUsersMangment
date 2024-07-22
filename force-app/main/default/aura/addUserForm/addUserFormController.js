@@ -22,5 +22,8 @@
 
         helper.createNewUser(component,lastname, email, alias, username, tz,loc,emlenco, lang, contactId, ProfileId);
     },
-    
+    cancelUserCreation : function(){
+        var domain = window.location.origin;
+        window.open(domain+ "/c/communitiesApp.app","_self");
+    }
 })

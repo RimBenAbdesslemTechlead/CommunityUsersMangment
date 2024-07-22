@@ -1,5 +1,8 @@
+/* eslint-disable no-unused-vars */
 ({
-    myAction : function(component, event, helper) {
+    redirectHome : function(component, event, helper) {
+        var domain =window.location.origin;
+        window.open(domain+ "/c/communitiesApp.app","_self");
 
     }
 })
