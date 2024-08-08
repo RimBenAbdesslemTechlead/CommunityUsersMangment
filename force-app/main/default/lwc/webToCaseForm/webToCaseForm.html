@@ -1,0 +1,58 @@
+<template>
+    <div class="container">
+        <h1>create new case</h1>
+        <!-- https://ruby-speed-88152-dev-ed.scratch.my.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8&orgId=00DPw000004ncrR" method="POST" -->
+        <form data-id="myForm" method="POST">
+            <input type="hidden" name="orgid" value="00DPw000004ncrR">
+            <input type="hidden" name="retURL" value="https://techleadtn.com/index.php/webtocase">
+    
+            <label><span>*</span> Required</label> <br/>
+            <select id="status" name="status">
+                <option hidden id="stat">Status</option>
+                <option value="New">New</option>
+                <option value="Working">Working</option>
+                <option value="Escalated">Escalated</option>
+                <option value="Closed">Closed</option>
+            </select><br>
+    
+            
+            <input id="name" class="inp" placeholder="Contact Name *" required maxlength="80" name="name" size="20" type="text"><br>
+    
+            
+            <select id="priority" name="priority">
+                <option hidden>Priority</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select><br>
+    
+            
+            <input id="email" class="inp" placeholder="Email *" required maxlength="80" name="email" size="20" type="text"><br>
+    
+            
+            <input id="subject" placeholder="Subject *" class="inp" required maxlength="80" name="subject" size="20" type="text"><br>
+    
+            
+            <textarea placeholder="Description *" required name="description"></textarea><br>
+    
+            
+            <select id="type" name="type">
+                <option>Type</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Electronic">Electronic</option>
+                <option value="Structural">Structural</option>
+                <option value="Other">Other</option>
+            </select><br>
+    
+            <input hidden data-id="myFInput" maxlength="100" name="00NPw000005j9In" size="20" type="text"><br>
+            <textarea hidden data-id="mySInput" name="00NPw000005jAQ9" rows="3" wrap="soft"></textarea><br>
+            <input hidden type="hidden" id="external" name="external" value="1"><br>
+            
+            <label for="attachment">Attachment</label><br/>
+            <input id="attachment" type="file" onchange={handleFileChange}><br>
+    
+            <button type="submit" name="submit">Submit</button>
+        </form>
+    </div>
+</template>

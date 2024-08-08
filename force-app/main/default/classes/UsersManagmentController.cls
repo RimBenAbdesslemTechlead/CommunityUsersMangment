@@ -1,4 +1,4 @@
-public with sharing class UsersManagmentController {
+global with sharing class UsersManagmentController {
     
     //custom class
     public class UserWrapper {
@@ -32,7 +32,7 @@ public with sharing class UsersManagmentController {
     @AuraEnabled
     public static List<Network> getCommunities(){
         try {
-            List<Network> communitiesNames = [select Name from network];
+            List<Network> communitiesNames = [SELECT Name, (SELECT Id FROM NetworkMembers) FROM Network];
             
             
             return communitiesNames;
@@ -41,35 +41,35 @@ public with sharing class UsersManagmentController {
         }
     }
 
-    @AuraEnabled
-    public static List<UserWrapper> getAllCommunitiesUsers() {
-        // Get all active communities
-        List<Network> communities = [SELECT Id, Name FROM Network WHERE Status = 'Live'];
+    // @AuraEnabled
+    // public static List<UserWrapper> getAllCommunitiesUsers() {
+    //     // Get all active communities
+    //     List<Network> communities = [SELECT Id, Name FROM Network WHERE Status = 'Live'];
 
-        // Initialize a map to hold unique users
-        Map<Id, UserWrapper> uniqueUsersMap = new Map<Id, UserWrapper>();
+    //     // Initialize a map to hold unique users
+    //     Map<Id, UserWrapper> uniqueUsersMap = new Map<Id, UserWrapper>();
 
-        // Loop through each community and get the users
-        for (Network community : communities) {
-            // Query to get user IDs for the current community
-            List<NetworkMember> communityMembers = [SELECT MemberId FROM NetworkMember WHERE NetworkId = :community.Id];
-            // Add the user IDs to the map
-            for (NetworkMember member : communityMembers) {
-                uniqueUsersMap.put(member.MemberId, null);
-            }
-        }
+    //     // Loop through each community and get the users
+    //     for (Network community : communities) {
+    //         // Query to get user IDs for the current community
+    //         List<NetworkMember> communityMembers = [SELECT MemberId FROM NetworkMember WHERE NetworkId = :community.Id];
+    //         // Add the user IDs to the map
+    //         for (NetworkMember member : communityMembers) {
+    //             uniqueUsersMap.put(member.MemberId, null);
+    //         }
+    //     }
 
-        // Query to get unique user details based on the collected IDs
-        List<User> uniqueUsers = [SELECT Profile.UserLicense.Name,  Lastname,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name FROM User WHERE Id IN :uniqueUsersMap.keySet()];
+    //     // Query to get unique user details based on the collected IDs
+    //     List<User> uniqueUsers = [SELECT Profile.UserLicense.Name,  Lastname,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name FROM User WHERE Id IN :uniqueUsersMap.keySet()];
 
-        // Update the map with user details
-        for (User user : uniqueUsers) {
-            uniqueUsersMap.put(user.Id, new UserWrapper(user));
-        }
-        System.debug('users : '+ uniqueUsersMap.values());
-        // Return the list of unique users
-        return uniqueUsersMap.values();
-    }
+    //     // Update the map with user details
+    //     for (User user : uniqueUsers) {
+    //         uniqueUsersMap.put(user.Id, new UserWrapper(user));
+    //     }
+    //     System.debug('users : '+ uniqueUsersMap.values());
+    //     // Return the list of unique users
+    //     return uniqueUsersMap.values();
+    // }
 
     @AuraEnabled
     public static List<UserWrapper> getCommunityUserByProfiles(String networkId, String userName){
@@ -163,34 +163,55 @@ return contactIds;
         }
     }
     //create many users
-    @AuraEnabled
-    public static String createNewUsers(List<User> users){
-        // List to hold created User records
-        List<User> createdUsers = new List<User>();
-        
-        for (User newUser : users) {
-            System.debug('User to be created: ' + newUser.LastName);
-            
-            // Optionally, add additional validation or processing logic here
-            
-            // Add the User record to the list
-            createdUsers.add(newUser);
+    
+        @AuraEnabled
+        public static String createNewUsers(List<User> users) {
+            // List to hold created User records
+            List<User> createdUsers = new List<User>();
+    
+            for (User newUser : users) {
+                if (String.isEmpty(newUser.ContactId)) {
+                    // Create a new Contact record
+                    
+                    try {
+                        Account acc = new Account(Name = newUser.LastName);
+                        insert acc;
+                        // create and Insert the Contact record into the database
+                        Contact con = new Contact(LastName = newUser.LastName, AccountId = acc.Id);
+                        insert con;
+                        System.debug('Contact created with success: ' + con.Id);
+                        
+                        // Set the ContactId on the User record
+                        newUser.ContactId = con.Id;
+                        
+                        // Add the User to the list for bulk insertion
+                        createdUsers.add(newUser);
+                    } catch (Exception e) {
+                        System.debug('error ' + e);
+                        return 'Error while creating user: ' + e.getMessage();
+                    }
+                } else {
+                    // If ContactId is provided, add the User directly to the list
+                    createdUsers.add(newUser);
+                }
+            }
+    
+            // Try to insert all User records at once
+            try {
+                insert createdUsers;
+                System.debug('Users created successfully');
+                return 'Users created successfully';
+            } catch (DmlException dmlEx) {
+                System.debug('DML exception: ' + dmlEx);
+                return 'Error during user creation: ' + dmlEx.getMessage();
+            }
         }
-        
-        // Optionally, insert all User records into the database
-        try {
-            insert createdUsers;
-            return 'users with Mass created with success';
-        } catch (DmlException exe) {
-            System.debug('DML exception' + exe);
-            return 'error' + exe;
-        }
-    }
+    
 
         @auraEnabled
-        public static String sendMailUser(String address, String subject, String body) {
+        public static String sendMailUser(String address, String subject, String body, String fileName, String base64Data, String contentType) {
             try {
-             EmailManager.sendMail(address, subject, body);
+             EmailManager.sendMail(address, subject, body,  fileName, base64Data, contentType);
                 return 'Mail sent with success';
             } catch (EmailException e) {
                 System.debug('exception : '+ e);
@@ -212,7 +233,7 @@ return contactIds;
             return 'user updated succesfully';
         } catch (DmlException e) {
              
-       System.debug('error : '+ e);
+      
        return 'error : '+ e ;
         }
         
@@ -221,7 +242,7 @@ return contactIds;
     @auraEnabled
     public static String desactivateSelectedUser(String userId){
         User u = [select name, isActive from user where id =: userId];
-        System.debug('users is'+ u);
+        
         try {
             u.IsActive = false;
             update u;
@@ -235,7 +256,7 @@ return contactIds;
     @auraEnabled
     public static String activateSelectedUser(String userId){
         User u = [select name, isActive from user where id =: userId];
-        System.debug('users is'+ u);
+        
         try {
             u.IsActive = true;
             update u;
@@ -254,17 +275,17 @@ return contactIds;
 
 
     @auraEnabled
-    public static String sendEmailToManyUsers(List<String> ids,String subject,String body){
+    public static String sendEmailToManyUsers(List<String> ids,String subject,String body, String fileName, String base64Data, String contentType){
         
         List<user> userWithIds = [select Email from User where Id IN :ids];
         for(User u : userWithIds){
             // System.debug('email : '+U.Email+ ' subject : '+ subject+ ' body : '+body);
             try {
                 
-                EmailManager.sendMail(U.Email, subject, body);
+                EmailManager.sendMail(U.Email, subject, body, fileName, base64Data, contentType);
 
             } catch (EmailException e) {
-                System.debug('error : '+ e);
+                
                 return 'error  : '+ e;
             }
                 
@@ -314,6 +335,35 @@ return contactIds;
         }
     }
     
-    
+    @AuraEnabled
+    public static Map<String, String> getLanguageLocaleKey() {
+        Map<String, String> languageCodes = new Map<String, String>();
+         for (PicklistEntry entry : User.LanguageLocaleKey.getDescribe().getPicklistValues()){
+             languageCodes.put(entry.getValue(), entry.getLabel());
+         }
+             
+        
+         return languageCodes;
+     }
+     @AuraEnabled
+    public static Map<String, String> getLocaleSidKey() {
+        Map<String, String> languageCodes = new Map<String, String>();
+         for (PicklistEntry entry : User.LocaleSidKey.getDescribe().getPicklistValues()){
+             languageCodes.put(entry.getValue(), entry.getLabel());
+         }
+             
+        
+         return languageCodes;
+     }
+
+     @AuraEnabled(cacheable=true)
+    public static String getOrgId() {
+        return UserInfo.getOrganizationId();
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static String getOrgBaseUrl() {
+        return URL.getOrgDomainUrl().toExternalForm();
+    }
     
 }

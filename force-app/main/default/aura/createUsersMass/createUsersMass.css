@@ -4,3 +4,9 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
+.THIS .visibleButtons {
+    display: inline-block;
+}
+.THIS .invisibleButtons {
+    display: none;
+}

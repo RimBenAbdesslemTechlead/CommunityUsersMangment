@@ -7,7 +7,7 @@
         </div>
         <div  class="headingContainer">
             <div>
-                <div class="createUserHeading">Create Single users</div>
+                <div class="createUserHeading">Create One user</div>
             </div>
             
             <lightning:breadcrumbs>

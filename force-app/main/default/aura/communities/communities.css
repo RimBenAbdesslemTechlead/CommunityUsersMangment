@@ -60,3 +60,32 @@
     margin-top: 20px;
     
 }
+.THIS .filterIconBtn {
+    margin-top: 15px;
+}
+.THIS .slds-text-color_success {
+    color: green;
+    font-weight: bold;
+}
+
+.THIS .slds-text-color_error {
+    color: red;
+    font-weight: bold;
+}
+.THIS .slds-p-around_small{
+    height: 100%;
+}
+
+
+.THIS .slds-table_header-fixed_container {
+    height: auto;
+}
+.THIS .slds-align_absolute-center {
+    margin-top: 10px;
+}
+
+.THIS .btnCommunity {
+    display: block;
+    width: 510px;
+    margin-bottom: 10px;
+}

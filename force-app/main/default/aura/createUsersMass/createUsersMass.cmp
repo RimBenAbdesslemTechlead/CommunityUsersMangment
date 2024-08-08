@@ -8,14 +8,30 @@
     <aura:attribute name="addUserButtonActive" type="Boolean"  default="true"/>
     <aura:attribute name="NbUsers" type="Integer" default="1"/>
     <aura:attribute name="isLoading" type="Boolean" default="true"/>
+    <aura:attribute name="createAddBtnsVisible" default="invisibleButtons" type="String"/>
+
+    <aura:attribute name="visibleToast" type="Boolean" default="false" />
+    <aura:attribute name="toastVariant" type="String" default="error" />
+    <aura:attribute name="toastIcon" type="String" default="error" />
+    <aura:attribute name="toastMessage" type="String"/>
+
     
+    <c:toast visibleToast="{!v.visibleToast}"  toastIcon="{!v.toastIcon}" toastVariant="{!v.toastVariant}" toastMessage="{! v.toastMessage}" />
+    
+    <!-- timezonz attributes from apex -->
+     <aura:attribute name="LanguageLocaleKeys" type="Map" />
+    <!-- timezonz attributes from apex -->
+     <aura:attribute name="LocaleSidKeys" type="Map" />
+
+
+
     <lightning:layout  multipleRows="true" horizontalAlign="center">
         <lightning:layoutItem size="6" >
             
         {! v.body}
         <div class="btns">
-            <lightning:button label="add other users" variant="brand" aura:id="addNewUser" onclick="{! c.handleNewUserClick}" disabled="{! !v.addUserButtonActive}" />
-            <lightning:button label="create users" variant="brand" aura:id="createUsersButton" onclick="{! c.createUsersMass}"/>
+            <lightning:button class="{! v.createAddBtnsVisible}" label="add other users" variant="brand" aura:id="addNewUser" onclick="{! c.handleNewUserClick}" disabled="{! !v.addUserButtonActive}" />
+            <lightning:button class="{! v.createAddBtnsVisible}" label="create users" variant="brand" aura:id="createUsersButton" onclick="{! c.createUsersMass}"/>
         </div>
         <aura:if isTrue="{! v.isLoading}">
                 <div>

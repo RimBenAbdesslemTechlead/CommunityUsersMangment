@@ -1,0 +1,26 @@
+<aura:component controller="UsersManagmentController" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+
+    
+    <!-- Attributes -->
+    <aura:attribute name="visibleToast" type="Boolean" default="false" />
+    <aura:attribute name="toastVariant" type="String" default="success" />
+    <aura:attribute name="toastIcon" type="String"  default="success"/>
+    <aura:attribute name="toastMessage" type="String" />
+    <aura:handler name="change" value="{!v.visibleToast}" action="{!c.init}" />
+    <!-- Toast Notification -->
+    <aura:if isTrue="{!v.visibleToast}">
+        <div><div class="{! 'toaser '+  v.toastVariant }" role="alert">
+            
+            <span title="{!v.toastIcon}">
+                <lightning:icon class="leftIcon" iconName="{! 'utility:' + v.toastIcon }" alternativeText="Success" size="medium" variant="inverse"/>
+            </span>
+            <div>
+                <h2 class="textMessage">{!v.toastMessage}</h2>
+            </div>
+            <button title="Close" onclick="{!c.deleteToast}">
+                <lightning:icon variant="bare" iconName="utility:close" alternativeText="close" size="medium"  />
+                
+            </button>
+        </div></div>
+    </aura:if>
+</aura:component>

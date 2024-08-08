@@ -46,6 +46,10 @@
     <!-- send email attributes to one user :::::::: -->
     <!--1)) send email to one user popup attribute -->
     <aura:attribute name="showSendMailPopup" type="Boolean" default="false"/>
+
+    <aura:attribute name="fileName" type="String"/>
+    <aura:attribute name="base64Data" type="String"/>
+    <aura:attribute name="contentType" type="String"/>
     
     <!-- send email attributes to many users:::::::: -->
     <!--1)) send email to many user popup attribute -->
@@ -54,7 +58,7 @@
     <!-- actions in mass attributes :::::::: -->
     <!--1)) handle selected rows attribute -->
     <aura:attribute name="idsOfAllSelectedRows" type="Object[]"/>
-    <aura:attribute name="selectedRow" type="Object"/>
+    <aura:attribute name="selectedRow" type="Object[]"/>
     <aura:attribute name="massActionsSelectionVisible" type="Boolean" default="false"/>
     
     <!-- attribute to set the width of the datatable and the filter -->
@@ -78,6 +82,18 @@
             ]"/>
         <aura:attribute name="operationsOfselectedProperty" type="String[]"/>
 
+        <!-- variable to store the number of filters visible -->
+         <aura:attribute name="visibleFiltersNumber" type="integer" default="1"/>
+        
+        
+        <aura:attribute name="visibleToast" type="Boolean" default="false" />
+        <aura:attribute name="toastVariant" type="String" default="error" />
+        <aura:attribute name="toastIcon" type="String" default="error" />
+        <aura:attribute name="toastMessage" type="String"/>
+        <aura:attribute name="isVisible" type="Boolean" default="true"/>
+         
+         <c:toast visibleToast="{!v.visibleToast}"  toastIcon="{!v.toastIcon}" toastVariant="{!v.toastVariant}" toastMessage="{! v.toastMessage}" />
+         
 
         <lightning:layout>  
             <lightning:layoutItem size="2">
@@ -104,8 +120,8 @@
                 </lightning:layoutItem>
                 <lightning:layoutItem>
                     <div class="flex-item"><!-- <lightning:combobox name="progress" label="Status" value="inProgress" placeholder="Select Progress" options="{! v.netList }" onchange="{! c.handleChange }"/> -->
-                        <lightning:button variant="brand" aura:id="addOneUserBtn" label="Add user"
-                        onclick="{! c.handleAddOneClick }" />
+                        <!-- <lightning:button variant="brand" aura:id="addOneUserBtn" label="Add user"
+                        onclick="{! c.handleAddOneClick }" /> -->
                         <lightning:button variant="brand" label="add many users" aura:id="addOneUserBtn"
                         onclick="{! c.handleAddManyClick}" />
                     
@@ -114,7 +130,7 @@
                           
                         <lightning:layoutItem size="5" padding="around-small">
                             <aura:if isTrue="{! v.massActionsSelectionVisible}">
-                                <lightning:select name="selectProfile" label="Profiles"  aura:id="selectProfile" onchange="{! c.handleMassActionChanged}">
+                                <lightning:select name="selectProfile"  aura:id="selectProfile" onchange="{! c.handleMassActionChanged}">
                                                         <option value="" label="Choose Acion" hidden="true">Choose Action</option>
                                                         <option value="sendEmail" text="Send email"></option>
                                                         <option value="resetPassword" text="reset password"/>
@@ -127,7 +143,7 @@
                         </lightning:layoutItem>
                         <lightning:layoutItem size="4" padding="around-small">
                             <lightning:input aura:id="myinput" type="text"
-                                value="{! v.textvalue }"  label="Enter some text"
+                                value="{! v.textvalue }"  placeholder="filter by name or email"
                                 onchange="{! c.handleInputChange}"
                                 />
                                 
@@ -135,7 +151,7 @@
                             </lightning:layoutItem>
                             <lightning:layoutItem size="3" padding="around-small">
                                 <div class="filterIconContainer">
-                                    <lightning:buttonIcon iconName="utility:filterList" variant="brand" onclick="{! c.isconButtonClicked }" alternativeText="Settings" title="Settings" />
+                                    <lightning:buttonIcon class="filterIconBtn" iconName="utility:filterList" variant="brand" onclick="{! c.isconButtonClicked }" alternativeText="Settings" title="Settings" />
                                 </div>
                             </lightning:layoutItem>
                     
@@ -153,39 +169,121 @@
                                 onrowaction="{! c.handleRowAction }" 
                                 onrowselection="{! c.rowSelection}"
                                 />
+
+                                <div class="slds-align_absolute-center"> 
+                                    <lightning:button label="First"
+                                                      iconName="utility:left"
+                                                      iconPosition="left"
+                                                      onclick="{!c.onFirst}"
+                                                      variant="success"
+                                                      disabled="{! v.currentPageNumber == 1}" />
+                                    <lightning:button label="Previous"
+                                                    disabled="{!v.currentPageNumber == 1}" 
+                                                    onclick="{!c.handlePrevious}"
+                                                    variant="brand"
+                                                    iconName="utility:back"
+                                                    name="previous"/>
+                                    
+                                    <span class="slds-badge slds-badge_lightest"
+                                        style="margin-right: 10px;margin-left: 10px;">
+                                        Page {!v.currentPageNumber} out of {!v.totalPages}
+                                    </span>
+                                    
+                                    <lightning:button label="Next"
+                                                    disabled="{!v.currentPageNumber == v.totalPages}"
+                                                    onclick="{!c.handleNext}"
+                                                    variant="brand"
+                                                    iconName="utility:forward"
+                                                    iconPosition="right"
+                                                    name="next"/>
+                                    <lightning:button label="Last"
+                                                    iconName="utility:right"
+                                                    iconPosition="right"
+                                                    variant="success"
+                                                    onclick="{!c.onLast}"
+                                                    disabled="{!v.currentPageNumber == v.totalPages}" />
+                                </div>
+
                             </lightning:layoutItem>
                             <aura:if isTrue="{! and(v.datatableWidth == 9, v.AllUsers.length != 0)}">
                             <lightning:layoutItem size="3" padding="around-small">
                                 
                                     
                             <div class="buttonContainer">
-                                <lightning:button name="cancel" label="Cancel" class="spacedButton" onclick="{! c.deleteFilters}"/>
+                                <lightning:button name="cancel" variant="destructive" label="Cancel" class="spacedButton" onclick="{! c.deleteFilters}"/>
                                 <lightning:button name="apply" variant="brand" label="Apply" class="spacedButton" onclick="{! c.applyFilters}"/>
                             </div>
+                                        <!-- the first filter component code -->
                                         <lightning:card class="fullWidthCard" title="filter users" iconName="standard:filter_criteria_rule">
                                             <aura:html tag="section" HTMLAttributes="{ 'aria-describedby': 'dialog-body-id-111', 'aria-label': 'Dialog Title', 'class': 'slds-popover slds-nubbin_left', 'role': 'dialog' }">
-                                                    <lightning:select aura:id="propSelect" onchange="{! c.propertySelectionChanged}" label="select property">
+                                                    <lightning:select aura:id="propSelect1" onchange="{! c.propertySelectionChanged}" label="select property">
                                                         <option label="property" value="license" hidden="true">select property</option>
                                                         <aura:iteration var="propIterator" items="{! v.selectionPropValue}">
                                                             <option value="{!propIterator.name}" label="{!propIterator.name}"/>
                                                         </aura:iteration>
                                                     </lightning:select>
                                                     
-                                                    <lightning:select aura:id="opSelect" label="select Operation">
+                                                    <lightning:select aura:id="opSelect1" label="select Operation">
                                                         <option label="operation" value="operation" hidden="true">operation</option>
                                                         <aura:iteration var="opIterator" items="{! v.operationsOfselectedProperty}">
                                                             <option value="{!opIterator}" label="{!opIterator}"/>
                                                         </aura:iteration>
                                                     </lightning:select>
-                                                    <lightning:input aura:id='valSelect'  label="set value" type="text" />
+                                                    <lightning:input aura:id='valSelect1'  label="set value" type="text" />
                                                     
                                                 </aura:html>
                                         </lightning:card>
+                                        <aura:if isTrue="{! v.visibleFiltersNumber >1}">
+                                            <!-- the second filter component code -->
+                                        <lightning:card class="fullWidthCard" title="filter users" iconName="standard:filter_criteria_rule">
+                                            <aura:html tag="section" HTMLAttributes="{ 'aria-describedby': 'dialog-body-id-111', 'aria-label': 'Dialog Title', 'class': 'slds-popover slds-nubbin_left', 'role': 'dialog' }">
+                                                    <lightning:select aura:id="propSelect2" onchange="{! c.propertySelectionChanged}" label="select property">
+                                                        <option label="property" value="license" hidden="true">select property</option>
+                                                        <aura:iteration var="propIterator" items="{! v.selectionPropValue}">
+                                                            <option value="{!propIterator.name}" label="{!propIterator.name}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                    
+                                                    <lightning:select aura:id="opSelect2" label="select Operation">
+                                                        <option label="operation" value="operation" hidden="true">operation</option>
+                                                        <aura:iteration var="opIterator" items="{! v.operationsOfselectedProperty}">
+                                                            <option value="{!opIterator}" label="{!opIterator}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                    <lightning:input aura:id='valSelect2'  label="set value" type="text" />
+                                                    
+                                                </aura:html>
+                                        </lightning:card>
+                                        </aura:if>
+                                        <!-- the third filter component code -->
+                                        <aura:if isTrue="{! v.visibleFiltersNumber >2}">
+                                            <lightning:card class="fullWidthCard" title="filter users" iconName="standard:filter_criteria_rule">
+                                            <aura:html tag="section" HTMLAttributes="{ 'aria-describedby': 'dialog-body-id-111', 'aria-label': 'Dialog Title', 'class': 'slds-popover slds-nubbin_left', 'role': 'dialog' }">
+                                                    <lightning:select aura:id="propSelect3" onchange="{! c.propertySelectionChanged}" label="select property">
+                                                        <option label="property" value="license" hidden="true">select property</option>
+                                                        <aura:iteration var="propIterator" items="{! v.selectionPropValue}">
+                                                            <option value="{!propIterator.name}" label="{!propIterator.name}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                    
+                                                    <lightning:select aura:id="opSelect3" label="select Operation">
+                                                        <option label="operation" value="operation" hidden="true">operation</option>
+                                                        <aura:iteration var="opIterator" items="{! v.operationsOfselectedProperty}">
+                                                            <option value="{!opIterator}" label="{!opIterator}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                    <lightning:input aura:id='valSelect3'  label="set value" type="text" />
+                                                    
+                                                </aura:html>
+                                        </lightning:card>
+                                        </aura:if>
+                                        
+                                        
                                                 
                                                 
                                                 <lightning:layoutItem>
                                                     <a href="#" onclick="{! c.handleAddFilterClicked}">Add Filter</a>
-                                                    <a href="#" onclick="{! c.deleteFilerClicked}">Delete Filter</a>
+                                                    <a href="#" onclick="{! c.handleDeleteFilerClicked}">Delete Filter</a>
                                                 </lightning:layoutItem>
                                                 
                                                 
@@ -193,37 +291,7 @@
                                         </aura:if>
                                     </lightning:layout>
                                     
-                          <div class="slds-align_absolute-center"> 
-                            <lightning:button label="First"
-                                              iconName="utility:left"
-                                              iconPosition="left"
-                                              onclick="{!c.onFirst}"
-                                              disabled="{! v.currentPageNumber == 1}" />
-                            <lightning:button label="Previous"
-                                              disabled="{!v.currentPageNumber == 1}" 
-                                              onclick="{!c.handlePrevious}"
-                                              variant="brand"
-                                              iconName="utility:back"
-                                              name="previous"/>
-                             
-                            <span class="slds-badge slds-badge_lightest"
-                                  style="margin-right: 10px;margin-left: 10px;">
-                                Page {!v.currentPageNumber} out of {!v.totalPages}
-                            </span>
-                             
-                            <lightning:button label="Next"
-                                              disabled="{!v.currentPageNumber == v.totalPages}"
-                                              onclick="{!c.handleNext}"
-                                              variant="brand"
-                                              iconName="utility:forward"
-                                              iconPosition="right"
-                                              name="next"/>
-                            <lightning:button label="Last"
-                                              iconName="utility:right"
-                                              iconPosition="right"
-                                              onclick="{!c.onLast}"
-                                              disabled="{!v.currentPageNumber == v.totalPages}" />
-                        </div>
+                          
                           <!-- button and event to navigate to component 2 -->
                            
                           <aura:if isTrue="{!v.showUpdateUserPopup}">
@@ -251,18 +319,7 @@
                                                     <lightning:input aura:id="emlenco" label="Email Encoding" type="text" value="UTF-8"/>
                                                     <lightning:input aura:id="lang" label="Language" type="text" value="en_US"/>
                                                     <lightning:input label="profile" type="text" value="{! v.ProfileName}" disabled="true"/>
-                                                    <!-- <lightning:select name="selectContact" label="Contacts"  aura:id="selectContact">
-                                                        <option value="" label="Choose contact" hidden="true">Choose contact</option>
-                                                        <aura:iteration items="{!v.contacts}" var="contact">
-                                                            <option value="{!contact.Id}" text="{!contact.Name}"/>
-                                                        </aura:iteration>
-                                                    </lightning:select>
-                                                    <lightning:select name="selectProfile" label="Profiles"  aura:id="selectProfile">
-                                                        <option value="" label="Choose profile" hidden="true">Choose profile</option>
-                                                        <aura:iteration items="{!v.profiles}" var="profile">
-                                                            <option value="{!profile.Id}" text="{!profile.Name}"/>
-                                                        </aura:iteration>
-                                                    </lightning:select> -->
+                                                    
                                                     
                                                     <div class="updateUserButton">
                                                         <lightning:button variant="brand" label="Update user" onclick="{!c.UpdateUser}"/>
@@ -292,6 +349,8 @@
                                                     <lightning:input aura:id="emailAddress" type="email" label="To: " name="emailAddress" value="{! v.email}"/>
                                                     <lightning:input aura:id="emailSubject" name="Email" label="Subject: " placeholder="set email Subject" type="text"/>
                                                     <lightning:textarea aura:id="emailBody" placeholder="set email content" label="email body"/>
+                                                    <lightning:input type="file" label="Upload Attachment" onchange="{!c.handleFileChange}" />
+
                                                     <lightning:button variant="brand" label="send email" onclick="{!c.sendMailToUser}"/>
                                                 </lightning:card>
                                             </lightning:layoutItem>
@@ -318,6 +377,8 @@
                                                     <!-- <lightning:input aura:id="ManyEmailAddresses" type="email" label="To: " name="emailAddress" value="{! v.email}"/> -->
                                                     <lightning:input aura:id="ManyEmailSubjects" name="subject" label="Subject: " placeholder="set email Subject" type="text"/>
                                                     <lightning:textarea aura:id="ManyEmailBodies" placeholder="set email content" label="email body"/>
+                                                    <lightning:input type="file" label="Upload Attachment" onchange="{!c.handleFileChange}" /> 
+                                                    
                                                     <lightning:button variant="brand" label="send email" onclick="{!c.sendMailToManyUsers}"/>
                                                 </lightning:card>
                                             </lightning:layoutItem>
@@ -333,6 +394,31 @@
             
         </lightning:layoutItem>
         </lightning:layout>
+      <!-- this is a toast  -->
+      <aura:if isTrue="{!v.isVisible}">
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" variant="brand" alternativeText="Close" onclick="{!c.closeCommunityPopup}" class="slds-button deleteBtn"/>
+                    <h2 class="slds-text-heading_medium">Communities</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <aura:iteration items="{!v.netList}" var="net">
+                        <lightning:button class="btnCommunity"  label="select" value="{!net.Id}" onclick="{!c.handleCommunityPopupClicked}">
+                            <lightning:card  title="{!net.Name}"  iconName="utility:groups" >
+                            <p class="slds-p-around_medium">
+                                Number of Users: {!net.usersNumber}
+                            </p>
+                        
+                        </lightning:card>
+                        </lightning:button>
+                    </aura:iteration>
+                    
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
       
       </aura:component>
     

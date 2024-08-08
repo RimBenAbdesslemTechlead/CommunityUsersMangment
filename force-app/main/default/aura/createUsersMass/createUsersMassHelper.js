@@ -9,19 +9,47 @@
             if (state === "SUCCESS") {
 
                 var action1 = component.get('c.getContacts');
-                action1.setCallback(this, function(contactsresponseResponse){
-                    component.set('v.contacts', contactsresponseResponse.getReturnValue());
-                    // console.log("from helper : ");
-                    // console.log("contatcts : ", response.getReturnValue());
-                    // console.log("profiles : ", profilesResponse.getReturnValue());
-                    callback(profilesResponse.getReturnValue(), contactsresponseResponse.getReturnValue());
-                    component.set('v.profiles', profilesResponse.getReturnValue());
-                    component.set('v.contacts', contactsresponseResponse.getReturnValue());
+                action1.setCallback(this, function(contactsResponse){
+                    if(contactsResponse.getState()==="SUCCESS"){
+                        
+
+
+                        var action2 = component.get("c.getLanguageLocaleKey");   
+                        action2.setCallback(this, function(localeKeyResponse){
+                            console.log("response.state() : ", localeKeyResponse.getState());
+                            if(localeKeyResponse.getState()==='SUCCESS') {
+                                var action3 = component.get("c.getLocaleSidKey");   
+                                action3.setCallback(this, function(localeSidKeyResponse){
+                                    component.set("v.LocaleSidKeys", localeSidKeyResponse.getReturnValue())
+                                    component.set("v.LanguageLocaleKeys", localeKeyResponse.getReturnValue())
+                                    component.set('v.profiles', profilesResponse.getReturnValue());
+                                    contactsResponse.getReturnValue().unshift({id:"", Name:"select contact", hidden : true});
+                                    component.set('v.contacts', contactsResponse.getReturnValue());
+
+                                    callback(profilesResponse.getReturnValue(), contactsResponse.getReturnValue(), localeKeyResponse.getReturnValue(),localeSidKeyResponse.getReturnValue());
+                                    
+                                })
+                                $A.enqueueAction(action3);
+                                
+                            }
+                            else if(localeKeyResponse.getState()==='ERROR') {
+                                console.log('error getting the localeKey map');
+                            }
+                        });
+                        $A.enqueueAction(action2);
+
+
+
+
+                        
+                        
+                        
+                    }
                 });
                 $A.enqueueAction(action1);
 
 
-                var profiles = profilesResponse.getReturnValue();
+               
                
                 
                 
@@ -43,15 +71,26 @@
         )
         action.setCallback(this, function(response){
             console.log("response.state() : ", response.getState());
-            if(response.getState()==='SUCCESS') {
-                console.log('users created sucessfully');
-                window.open(window.location.origin + "/c/communitiesApp.app","_self");
+            if(response.getState()==='SUCCESS' && !response.getReturnValue().startsWith("Error")) {
+                console.log('users created successfully : ', response.getReturnValue());
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "success")
+                    component.set("v.toastIcon", "success")
+                    component.set("v.toastMessage", "new users added with success")
+                setTimeout(function(){
+                    window.open(window.location.origin + "/c/communitiesApp.app","_self");
+                }, 3000)
             }
-            else if(response.getState()==='ERROR') {
+            else{
                 console.log('error while creating users');
+                component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "error")
+                    component.set("v.toastIcon", "error")
+                    component.set("v.toastMessage", "error while adding new users")
             }
         });
         $A.enqueueAction(action);
 
-    }
+    },
+    
 })

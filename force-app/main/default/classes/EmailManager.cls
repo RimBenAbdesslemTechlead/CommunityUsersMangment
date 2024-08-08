@@ -1,6 +1,6 @@
 public with sharing class EmailManager  {
     // Public method
-    public static void sendMail(String address, String subject, String body) {
+    public static void sendMail(String address, String subject, String body, String fileName, String base64Data, String contentType) {
         // Create an email message object
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
         String[] toAddresses = new String[] {address};
@@ -9,6 +9,19 @@ public with sharing class EmailManager  {
         mail.setPlainTextBody(body);
         // Pass this email message to the built-in sendEmail method 
         // of the Messaging class
+
+                
+if(!String.isEmpty(fileName) && ! String.isEmpty(base64Data) && String.isEmpty(contentType)){
+// Create the email attachment
+    Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+    attachment.setFileName(fileName);
+    attachment.setBody(EncodingUtil.base64Decode(base64Data));
+    attachment.setContentType(contentType);
+
+    // Attach the file to the email
+    mail.setFileAttachments(new Messaging.EmailFileAttachment[] { attachment });
+}
+
         Messaging.SendEmailResult[] results = Messaging.sendEmail(
                                   new Messaging.SingleEmailMessage[] { mail });
         // Call a helper method to inspect the returned results

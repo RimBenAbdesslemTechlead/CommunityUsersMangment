@@ -9,8 +9,8 @@
             <div class="AdminLinks">
                 <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/c/communitiesApp.app#/">Home</a>
                 <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Org setup</a>
-                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Dashboards</a>
-                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Web to case</a>
+                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Graphs</a>
+                <a href="https://drive-customization-4416-dev-ed.scratch.lightning.force.com/lightning/setup/SetupOneHome/home">Cases</a>
             </div>
             <div class="salesforceCommunity Admin">
                 <!-- Use the $Resource global variable to reference the static resource -->

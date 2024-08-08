@@ -1,40 +1,52 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-redeclare */
 /* eslint-disable no-unused-vars */
 /* eslint-disable dot-notation */
 /* eslint-disable no-console */
 /* eslint-disable no-return-assign */
-({getAllUsersOfAllCommunities : function(component){
-     //get the comunities from the apex class
-     var action = component.get("c.getAllCommunitiesUsers");
-     action.setCallback(this,function(response){
-        if(response.getState()==='SUCCESS'){
-            component.set('v.listOfAccounts',response.getReturnValue());
-            component.set('v.AllUsers',response.getReturnValue())
+({
+//     getAllUsersOfAllCommunities : function(component){
+//      //get the comunities from the apex class
+//      var action = component.get("c.getAllCommunitiesUsers");
+//      action.setCallback(this,function(response){
+//         if(response.getState()==='SUCCESS'){
+//             component.set('v.listOfAccounts',response.getReturnValue());
+//             component.set('v.AllUsers',response.getReturnValue())
             
-            this.preparePagination(component, response.getReturnValue());
-            console.log('success : ', response.getReturnValue());
+//             this.preparePagination(component, response.getReturnValue());
+//             console.log('success : ', response.getReturnValue());
             
             
             
-        }
-        else if (response.getState() === "ERROR") {
-            var errors = response.getError();
-            // eslint-disable-next-line no-console
-            console.error('errors :', errors);
+//         }
+//         else if (response.getState() === "ERROR") {
+//             var errors = response.getError();
+//             // eslint-disable-next-line no-console
+//             console.error('errors :', errors);
             
-        }
-     });
+//         }
+//      });
 
- $A.enqueueAction(action);
-},
+//  $A.enqueueAction(action);
+// },
     allcommunities : function(component) {
         //get the comunities from the apex class
         var action = component.get("c.getCommunities");
         action.setCallback(this,function(response)
         {
+            var userlist = response.getReturnValue().map(function(element){
+                return {
+                    Name : element.Name,
+                    Id : element.Id,
+                    usersNumber : element.NetworkMembers.length
+                }
+            })
             
-            component.set("v.netList",response.getReturnValue()) ; 
+            component.set("v.netList",userlist) ;
+
+
+            
             
         });
 
@@ -91,8 +103,17 @@
             
             action.setCallback(this, function(response){
                 if(response.getState()==='SUCCESS'){
+                    response.getReturnValue().forEach(function(element, index, array){
+                        if(element.isActive === true){
+                            array[index].statusClass = 'slds-text-color_success'
+                        }
+                        else{
+                            array[index].statusClass = 'slds-text-color_error'
+                        }
+                    })
                     component.set('v.listOfAccounts',response.getReturnValue());
                     component.set('v.AllUsers',response.getReturnValue())
+                    
                     
                     this.preparePagination(component, response.getReturnValue());
                     console.log('success : ', response.getReturnValue());
@@ -125,6 +146,7 @@
                     var rowIndex = rows.indexOf(row);
                     rows[rowIndex]['isActive'] = false;
                     rows[rowIndex]['active'] = 'Inactive';
+                    rows[rowIndex]['statusClass'] = 'slds-text-color_error';
                     component.set('v.listOfAccounts', rows);
 
                     //make user inactive in datatable view
@@ -132,10 +154,19 @@
                     var rowIndex2 = rows2.indexOf(row);
                     rows2[rowIndex2]['isActive'] = false;
                     rows2[rowIndex2]['active'] = 'Inactive';
+                    rows2[rowIndex2]['statusClass'] = 'slds-text-color_error';
                     component.set('v.paginationList', rows2);
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "success")
+                    component.set("v.toastIcon", "success")
+                    component.set("v.toastMessage", "user deactivated with success")
                 }
                 else if(response.getState()==='ERROR'){
                     console.log("error : ", response.getError());
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "error")
+                    component.set("v.toastIcon", "error")
+                    component.set("v.toastMessage", "error while deactivating user")
                 }
             })
             $A.enqueueAction(action);
@@ -149,14 +180,19 @@
                 if(response.getState() === "SUCCESS"){
                 
                     if(response.getReturnValue().startsWith('error in activation')){
-                        console.log('error in activation', response.getReturnValue());
+                        // console.log('error in activation', response.getReturnValue());
+                        component.set("v.visibleToast", true)
+                        component.set("v.toastVariant", "error")
+                        component.set("v.toastIcon", "error")
+                        component.set("v.toastMessage", "error while activating user")
                     }
                     else{
-                        //make user inactive in action selection view
+                        //make user inactive in the hole list of users(not the printed in datatable)
                         var rows = component.get('v.listOfAccounts');
                         var rowIndex = rows.indexOf(row);
                         rows[rowIndex]['isActive'] = true;
                         rows[rowIndex]['active'] = 'Active';
+                        rows[rowIndex]['statusClass'] = 'slds-text-color_success';
                         component.set('v.listOfAccounts', rows);
     
                         //make user inactive in datatable view
@@ -164,11 +200,20 @@
                         var rowIndex2 = rows2.indexOf(row);
                         rows2[rowIndex2]['isActive'] = true;
                         rows2[rowIndex2]['active'] = 'Active';
+                        rows2[rowIndex2]['statusClass'] = 'slds-text-color_success';
                         component.set('v.paginationList', rows2);
+                        component.set("v.visibleToast", true)
+                        component.set("v.toastVariant", "success")
+                        component.set("v.toastIcon", "success")
+                        component.set("v.toastMessage", "user activated with success")
                     }
                 }
                 else if(response.getState()==='ERROR'){
                     console.log("error : ", response.getError());
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "error")
+                    component.set("v.toastIcon", "error")
+                    component.set("v.toastMessage", "error while deactivating user")
                 }
             })
             $A.enqueueAction(action);
@@ -222,21 +267,40 @@
 
     sendMailHelper: function(component, address, subject, body){
         var action = component.get("c.sendMailUser");
-        
+        var fileName = component.get("v.fileName");
+        var base64Data = component.get("v.base64Data");
+        var contentType = component.get("v.contentType");
         action.setParams(
             {
                 address : address ,
                 subject : subject ,
                 body    : body ,
+                fileName: fileName,
+                base64Data: base64Data,
+                contentType: contentType
             }
         )
         action.setCallback(this, function(response){
-            if (response.getState()==='SUCCESS') {
+            if (response.getState()==='SUCCESS' && !response.getReturnValue().startsWith("Error")) {
                 console.log('success : ' + response.getReturnValue());
+                
+                component.set("v.visibleToast", true)
+                component.set("v.toastVariant", "success")
+                component.set("v.toastIcon", "success")
+                component.set("v.toastMessage", "mail sent with success")
+                component.set("v.showSendMailPopup", false)
             }
-            else if (response.getState()==='ERROR') {
+            else {
                 console.log("Error : ", response.getError());
+                component.set("v.visibleToast", true)
+                component.set("v.toastVariant", "error")
+                component.set("v.toastIcon", "error")
+                component.set("v.showSendMailPopup", false)
+                component.set("v.toastMessage", "error when sending mail")
             }
+            component.set("v.fileName", "");
+            component.set("v.base64Data", "");
+            component.set("v.contentType", "");
         });
         $A.enqueueAction(action);
         },
@@ -247,12 +311,34 @@
                 user :user
             });
             action.setCallback(this, function(response){
-                if(response.state==='SUCCESS'){
+                if(response.getState()==='SUCCESS' && ! response.getReturnValue().startsWith('error')){
                    // eslint-disable-next-line no-console
-                console.log("response", response.getReturnValue());
+                   var paginationList = component.get("v.paginationList")
+                   paginationList.forEach(function(element, index, array){
+                    if(element.Id === user.Id){
+                        array[index].Lastname = user.LastName;
+                        array[index].email = user.Email;
+                        array[index].alias = user.Alias;
+                        array[index].username = user.Username;
+                        
+                    }
+                    
+                   })
+                   component.set("v.paginationList",paginationList )
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "success")
+                    component.set("v.toastIcon", "success")
+                    component.set("v.showUpdateUserPopup", false)
+                    component.set("v.toastMessage", "user updated successfully")
+                console.log("success response : ", response.getReturnValue());
                }else{
                    // eslint-disable-next-line no-console
                    console.log(response.error);
+                   component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "error")
+                    component.set("v.toastIcon", "error")
+                    component.set("v.showUpdateUserPopup", false)
+                    component.set("v.toastMessage", "error while updating user")
                }
             })
         $A.enqueueAction(action);
@@ -266,9 +352,17 @@
             action.setCallback(this, function(response){
                 if(response.getState() === 'SUCCESS'){
                     console.log("succes of password reset");
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "success")
+                    component.set("v.toastIcon", "success")
+                    component.set("v.toastMessage", "reset password mail sent with success")
                 }
                 else if(response.getState() === 'ERROR'){
                     console.log('error resetting password');
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "error")
+                    component.set("v.toastIcon", "error")
+                    component.set("v.toastMessage", "error while resetting password")
                 }
             })
             $A.enqueueAction(action);
@@ -276,17 +370,34 @@
         
         sendManyMails : function(component, ids, subject, body){
             var action = component.get("c.sendEmailToManyUsers");
+            var fileName = component.get("v.fileName");
+            var base64Data = component.get("v.base64Data");
+            var contentType = component.get("v.contentType");
             action.setParams({
                 ids :ids,
                 subject: subject,
-                body : body
+                body : body,
+                fileName: fileName,
+                base64Data: base64Data,
+                contentType: contentType
             })
             action.setCallback(this, function(response){
-                if(response.getState() === "SUCCESS"){
+                if(response.getState() === "SUCCESS" && !response.getReturnValue().startsWith('error')){
                     console.log('success to send namy mails: ', response.getReturnValue());
+                    
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "success")
+                    component.set("v.toastIcon", "success")
+                    component.set("v.toastMessage", "mail is sent to selected users")
+                    component.set("v.sendMailManyUsersPopUp_visible", false)
                 }
-                else if(response.getState() === "ERROR"){
-                    console.log("fail to send namy mails: ", response.getError());
+                else{
+                    
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "error")
+                    component.set("v.toastIcon", "error")
+                    component.set("v.toastMessage", "error while sending the mail")
+                    component.set("v.sendMailManyUsersPopUp_visible", false)
                 }
             })
             $A.enqueueAction(action);
@@ -300,10 +411,18 @@
             action.setCallback(this, function(response){
                 if(response.getState() === "SUCCESS"){
                     console.log(response.getReturnValue());
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "success")
+                    component.set("v.toastIcon", "success")
+                    component.set("v.toastMessage", "Reset many password success")
                     
                 }
                 else if(response.getState() === "ERROR"){
                     console.log("fail to reset many passwords" , response.getError());
+                    component.set("v.visibleToast", true)
+                    component.set("v.toastVariant", "error")
+                    component.set("v.toastIcon", "error")
+                    component.set("v.toastMessage", "error while resetting many passwords")
                 }
             })
             $A.enqueueAction(action);
@@ -318,37 +437,29 @@
             action.setCallback(this, function(response){
                 if(response.getState() === "SUCCESS"){
                     console.log('success : ',response.getReturnValue());
-                    var accounts = component.get('v.listOfAccounts');
+
                     if(response.getReturnValue().startsWith('Success')){
-                        var i=0;
-                        for(i=0;i<accounts.length;i++){
-                            if(ids.includes(accounts[i].Id))
-                                accounts[i]['isActive'] = true;
-                                accounts[i]['active'] = 'Active';
-                        }
-                        
+                        var accounts = component.get('v.listOfAccounts');
+                        accounts.forEach(function(element, index, array){
+                            if(ids.includes(element.Id)){
+                                array[index]['isActive'] = true;
+                                array[index]['active'] = 'Active';
+                                array[index]['statusClass'] = 'slds-text-color_success';
+                            }
+                        })
                         component.set("v.listOfAccounts", accounts);
 
-                        
-                        //make user inactive in datatable view
                         var paginationList = component.get('v.paginationList');
-                        for( i=0;i<accounts.paginationList;i++){
-                            if(ids.includes(paginationList[i].ids));
-                            paginationList[i]['isActive'] = true;
-                            paginationList[i]['active'] = 'Active';
-                        }
-                        
-                        component.set('v.paginationList', paginationList);
-
-
-
-                        console.log('success : '+ response.getReturnValue());
-                        
-                    }
-                    else{
-                        console.log("server error");
+                        paginationList.forEach(function(element, index, array){
+                            if(ids.includes(element.Id)){
+                                array[index]['isActive'] = true;
+                                array[index]['active'] = 'Active';
+                            }
+                        })
+                        component.set("v.paginationList", paginationList);
                     }
                 }
+                
                 else if(response.getState() === "ERROR"){
                     console.log("fail : " , response.getError());
                 }
@@ -372,6 +483,7 @@
                             if(ids.includes(element.Id)){
                                 array[index]['isActive'] = false;
                                 array[index]['active'] = 'Inactive';
+                                array[index]['statusClass'] = 'slds-text-color_error';
                             }
                         })
                         component.set("v.listOfAccounts", accounts);
@@ -392,10 +504,9 @@
             })
             $A.enqueueAction(action);
         },
-        FilterString : function(component, prop){
+        FilterString : function(component, prop, operation, value){
             var data = component.get("v.listOfAccounts");
-            var operation   = component.find("opSelect").get("v.value")
-            var value  = component.find("valSelect").get("v.value")
+            
             console.log("from filterByLicense : ",operation, value);
             
             switch(operation.toLowerCase()){
@@ -440,8 +551,8 @@
             }
             
         },
-        filterStatus : function(component){
-            var value = component.find("valSelect").get("v.value")
+        filterStatus : function(component, value){
+            
             var filteredWithStatus = component.get("v.listOfAccounts").filter(function(element){
                 if(value === 'true' && element["isActive"] === true){
                     return true
@@ -456,5 +567,7 @@
             console.log("isActive : ", value);
             component.set("v.listOfAccounts", filteredWithStatus);
             component.set("v.paginationList", filteredWithStatus.slice(0,10));
-        }
+        },
+        
+        
 })

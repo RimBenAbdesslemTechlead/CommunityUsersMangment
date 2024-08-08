@@ -1,0 +1,54 @@
+.THIS {}
+
+@keyframes toTransit {
+    0%  {
+        top :10%
+    }
+    70% {
+        top : 4%
+    }
+    100% {
+        top : 5%
+    }
+}
+
+
+.THIS .toaser {
+
+    min-width: 300px;
+    position: fixed;
+    z-index: 1000;  
+    top: 5%;
+    left: calc(50% - 150px);
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    animation-name: toTransit;
+    animation-duration: 1.5s;
+    animation-timing-function: ease;
+    border-radius: 20px;
+    opacity: 95%;
+    
+   
+}
+.THIS .success {
+    background-color: rgb(1, 103, 1);
+}
+.THIS .error {
+    background-color: rgb(151, 5, 5);
+}
+
+.THIS .textMessage {
+    color: white;
+    font-size: 17px;
+    font-weight: 500;
+}
+.THIS button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: fit-content;
+}
+.THIS .leftIcon {
+    margin-right: 5px;
+}
