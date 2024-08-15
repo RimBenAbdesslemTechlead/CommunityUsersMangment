@@ -1,0 +1,57 @@
+<template>
+    <div class="container">
+        <!-- Status Field -->
+        <h1>Create a Case</h1>
+        <label><span>* </span>Required</label>
+        <select id="status" name="status" required onchange={handleInputChange} data-id="status">
+            <option hidden>Status *</option>
+            <option value="New">New</option>
+            <option value="Working">Working</option>
+            <option value="Escalated">Escalated</option>
+            <option value="Closed">Closed</option>
+        </select><br>
+
+        <!-- Contact Name Field -->
+       
+        <input class="inp" type="text" id="contact" name="name" required placeholder="Contact Name *" onchange={handleInputChange}><br>
+
+        <!-- Priority Field -->
+        
+        <select id="priority" name="priority" required onchange={handleInputChange} data-id="priority">
+            <option hidden>Priority *</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+        </select><br>
+
+        <!-- Email Field -->
+        
+        <input class="inp" type="email" id="email" name="email" placeholder="Your Email *" onchange={handleInputChange} data-id="email" required><br>
+
+        <!-- Subject Field -->
+        
+        <input class="inp" type="text" id="subject" name="subject" placeholder="Subject *" onchange={handleInputChange} data-id="subject" required><br>
+
+        <!-- Description Field -->
+
+        <textarea class="inp desc" id="description" name="description" placeholder="Description *" onchange={handleInputChange} data-id="description" required></textarea><br>
+
+        <!-- Type Field -->
+        
+        <select id="type" name="type" required onchange={handleInputChange} data-id="type">
+            <option hidden>Type *</option>
+            <option value="Mechanical">Mechanical</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Electronic">Electronic</option>
+            <option value="Structural">Structural</option>
+            <option value="Other">Other</option>
+        </select><br>
+
+        <!-- Attachment Field -->
+        <label>Attachment</label>
+        <input  type="file" id="attachment" name="attachment" multiple onchange={handleFileChange}><br>
+
+        <!-- Submit Button -->
+        <button type="submit" onclick={handleSubmit}>Submit</button>
+    </div>
+</template>

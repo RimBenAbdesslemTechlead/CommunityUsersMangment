@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-shadow */
 /* eslint-disable guard-for-in */
@@ -98,13 +99,22 @@
                 
                 helper.activateUser(component, row);
             break;
-
+            case 'switch_to_community_user':
+                
+                helper.switchToCommunityUser(component, row)
+                
+            break;
+            case 'switch_to_community_login_user':
+                helper.switchToCommunityLoginUser(component, row);
+            break;
+                
             default : 
                 console.log("switch default action");
                 
             break;
         }
 },
+    
     
     //select bar change to get users by community name
      handleChange: function(component, event, helper) {
@@ -127,57 +137,40 @@
         helper.sortData(cmp, fieldName, sortDirection);
     },
     
-        rowSelection: function(component, event) {
-            var selectedRows = event.getParam('selectedRows');
-            var selectedRowAll = component.get("v.selectedRow")
-        
-            selectedRows.forEach(function(item1) {
-                // Check if item1 is in array2 based on Id
-                var exists = selectedRowAll.some(function(item2) {
-                    return item2.Id === item1.Id;
-                });
-            
-                // If item1 does not exist in array2, add it
-                if (!exists) {
-                    selectedRowAll.push(item1);
-                }
-            });
-
-            var idsOfAllSelectedRows = component.get("v.idsOfAllSelectedRows");
-
-            console.log("allselect : ", selectedRowAll);
-            
-            selectedRowAll.forEach(function(row) {
-                if (!idsOfAllSelectedRows.includes(row.Id)) {
-                    idsOfAllSelectedRows.push(row.Id);
-                }
-                
-                
-            });
-            // idsOfAllSelectedRows = idsOfAllSelectedRows.filter(function(element1){
-            //     return selectedRowAll.some(function(element2){
-            //         element1 === element2.Id
-            //     })
-            // })
-
-
-
-            if(idsOfAllSelectedRows.length >1){
-            
-                component.set("v.massActionsSelectionVisible", true)
+    rowSelection: function(component, event) {
+        var selectedRows = event.getParam('selectedRows');
+        var selectedRowsMap = component.get("v.selectedRowsMap") || new Map();
+    
+        // Add or remove selected rows to the map
+        selectedRows.forEach(function(row) {
+            if (selectedRowsMap.has(row.Id)) {
+                selectedRowsMap.delete(row.Id); // Deselect row
+            } else {
+                selectedRowsMap.set(row.Id, row); // Select row
             }
-            console.log("idsOfAllSelectedRows : ", idsOfAllSelectedRows.length);
-            component.find("datatable").set("v.selectedRows", idsOfAllSelectedRows);
-            component.set("v.idsOfAllSelectedRows", idsOfAllSelectedRows);
-            component.set("v.selectedRow", selectedRowAll);
-        },
+        });
     
+        // Convert the Map to an array of IDs and an array of rows
+        var idsOfSelectedRows = Array.from(selectedRowsMap.keys());
+        var selectedRowsAll = Array.from(selectedRowsMap.values());
     
+        // Update datatable and component attributes
+        component.find("datatable").set("v.selectedRows", idsOfSelectedRows);
+        component.set("v.idsOfAllSelectedRows", idsOfSelectedRows);
+        component.set("v.selectedRowsAll", selectedRowsAll);
+        component.set("v.selectedRowsMap", selectedRowsMap);
+    
+        console.log("Selected Rows All: ", selectedRowsAll);
+    }
+    
+    ,
+
 
      
     handleNext: function(component, event, helper){
         var idsOfAllSelectedRows = component.get("v.idsOfAllSelectedRows");  
-        component.set("v.idsOfAllSelectedRows", idsOfAllSelectedRows)      
+        console.log("from next : ", idsOfAllSelectedRows.length);
+        
         component.set("v.currentPageNumber", component.get("v.currentPageNumber") + 1);
         helper.setPaginateData(component);
 

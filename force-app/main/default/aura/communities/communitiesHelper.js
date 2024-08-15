@@ -74,11 +74,28 @@
                 {'label': 'Activate','iconName': 'utility:adduser','name': 'activate'}
                 );
         }
+
+        if(row['ProfileName']==="Customer Community Login User"){
+            actions.push(
+                {'label' : 'switch to community user', 'name' : 'switch_to_community_user', 'iconName': 'utility:email'}
+            )
+        }
+        else if(row['ProfileName']==="Customer Community User"){
+            actions.push(
+                {'label' : 'switch to community Login user', 'name' : 'switch_to_community_login_user', 'iconName': 'utility:email'}
+            )
+        }
+
+
+
         // simulate a trip to the server
         setTimeout($A.getCallback(function () {
             doneCallback(actions);
         }), 200);
     },
+
+    
+
     activateContact: function (cmp, row) {
         var rows = cmp.get('v.listOfAccounts');
         var rowIndex = rows.indexOf(row);
@@ -131,6 +148,88 @@
         $A.enqueueAction(action);
     
         },
+        switchToCommunityUser : function(component, row){
+            var action = component.get("c.switchToCommunityUserApex")
+            console.log('rowid = ', row.Id);
+            
+            action.setParams({
+                userID : row.Id
+            })
+            action.setCallback(this, function(Response){
+                if(Response.getState()==="SUCCESS"){
+                    
+
+
+                    var paginationList = component.get("v.paginationList")
+                   paginationList.forEach(function(element, index, array){
+                    if(element.Id === row.Id){
+                       array[index].ProfileName="Customer Community User";
+                        
+                    }
+                    
+                   })
+                   var paginationList = component.set("v.paginationList", paginationList);
+
+
+                        component.set("v.visibleToast", true)
+                        component.set("v.toastVariant", "success")
+                        component.set("v.toastIcon", "success")
+                        component.set("v.toastMessage", "profile changed to community user");
+                    
+                }
+                else{
+                        component.set("v.visibleToast", true)
+                        component.set("v.toastVariant", "error")
+                        component.set("v.toastIcon", "error")
+                        component.set("v.toastMessage", "error while changing profile")
+                }
+            })
+            $A.enqueueAction(action)
+        },
+
+
+        switchToCommunityLoginUser : function(component, row){
+            var action = component.get("c.switchToCommunityLoginUserApex")
+            console.log('rowid = ', row.Id);
+            
+            action.setParams({
+                userID : row.Id
+            })
+            action.setCallback(this, function(Response){
+                if(Response.getState()==="SUCCESS"){
+                    
+
+
+                    var paginationList = component.get("v.paginationList")
+                   paginationList.forEach(function(element, index, array){
+                    if(element.Id === row.Id){
+                       array[index].ProfileName="Customer Community Login User";
+                        
+                    }
+                    
+                   })
+                   var paginationList = component.set("v.paginationList", paginationList);
+
+
+                        component.set("v.visibleToast", true)
+                        component.set("v.toastVariant", "success")
+                        component.set("v.toastIcon", "success")
+                        component.set("v.toastMessage", "profile changed to community login user");
+                    
+                }
+                else{
+                        component.set("v.visibleToast", true)
+                        component.set("v.toastVariant", "error")
+                        component.set("v.toastIcon", "error")
+                        component.set("v.toastMessage", "error while changing profile")
+                }
+            })
+            $A.enqueueAction(action)
+        },
+
+
+
+
         //desactivate User:$A
         deactivateUser : function(component, row){
             

@@ -20,24 +20,67 @@
     padding: 15px;
     background-color: white;
 }
-
+.THIS .slds-size_2-of-12{
+    display: flex;
+    justify-content: center;
+}
+.THIS .slds-size_10-of-12 {
+    margin-left: 15px;
+}
 .THIS .Pagetitle{
     color : rgb(0, 0, 0);
     font-size: 30px;
     font-weight: 700;
     margin-bottom: 20px;
 }
+.THIS .btnContainer {
+    background-color: transparent;
+    margin-top: 2px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    color: rgb(45, 44, 44);
+}
+.THIS .btnContainer:hover{
+    background-color: rgb(45, 44, 44);
+    color: white;
+}
+.THIS .btnC:hover {
+    color: inherit;
+    background-color: transparent;
+}
+.THIS .btnC {
+    align-self: flex-start;
+    border: none;
+    font-weight: bold;
+    font-size: medium;
+    transition: .5s ease;
+    width:fit-content;
+    
+    text-align: left; /* Align the text to the left */
+    padding-left: 0; /* Remove any default padding on the left side */
+    padding-right: 0;
+    background-color: inherit;
+    color : inherit; 
+    margin-left: 3px;/* Remove any default padding on the right side */
+}
+
+
+
+
 .THIS .communitiesSelect {
     margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    flex: 1;
 }
 .THIS .filterIconContainer {
     display: flex;
     justify-content: flex-end;
 }
-.THIS .slds-button {
-    /* width: fit-content; */
-    align-self: flex-end;
-}
+
 .THIS .deleteBtn {
     background-color: rgb(240, 60, 60);
     border: none;
@@ -88,4 +131,34 @@
     display: block;
     width: 510px;
     margin-bottom: 10px;
+    
+}
+.THIS .slds-modal__content {
+    display: flex;
+    flex-direction: column;
+}
+.THIS .communitiesHeading {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #2a78aa;
+    margin-left: 3px;
+    align-self: flex-start;
+
+}
+
+.THIS .slds-modal__content>.slds-button {
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    transition: .4s  ease-in-out ;
+}
+
+.THIS .slds-modal__content>.slds-button:hover {
+    background-color: rgb(45, 44, 44);
+    color: white;
+    
+}
+.THIS .slds-button>.slds-card {
+    background-color: transparent;
 }

@@ -58,7 +58,8 @@
     <!-- actions in mass attributes :::::::: -->
     <!--1)) handle selected rows attribute -->
     <aura:attribute name="idsOfAllSelectedRows" type="Object[]"/>
-    <aura:attribute name="selectedRow" type="Object[]"/>
+    <aura:attribute name="selectedRowsAll" type="Object[]"/>
+    <aura:attribute name="selectedRowsMap" type="Object" default="{}" />
     <aura:attribute name="massActionsSelectionVisible" type="Boolean" default="false"/>
     
     <!-- attribute to set the width of the datatable and the filter -->
@@ -98,13 +99,24 @@
         <lightning:layout>  
             <lightning:layoutItem size="2">
                  <div class="communitiesSelect">
+                    
                     <!--select component for communities-->
-                    <lightning:select name="select network" label="Networks" required="true" onchange="{! c.handleChange }">
-                        <option value="" label="Choose community" hidden="true">Choose community</option>
+                    
+                    <h1 class="communitiesHeading">communities List</h1>
+                   
                         <aura:iteration items="{!v.netList}" var="net">
-                        <option value="{!net.Id}" text="{!net.Name}" />
+                            <div class="btnContainer">
+                                <lightning:button 
+                                    class="btnC" 
+                                    iconName="utility:world" 
+                                    label="{!net.Name}" 
+                                    iconPosition="left" 
+                                    value="{!net.Id}" 
+                                    onclick="{! c.handleChange }" />
+  
+                            </div>
                         </aura:iteration>
-                    </lightning:select>
+                    
                  </div>
             </lightning:layoutItem>
 

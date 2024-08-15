@@ -43,7 +43,7 @@ global with sharing class UsersManagmentController {
 
     // @AuraEnabled
     // public static List<UserWrapper> getAllCommunitiesUsers() {
-    //     // Get all active communities
+    //     // Get all active communities 
     //     List<Network> communities = [SELECT Id, Name FROM Network WHERE Status = 'Live'];
 
     //     // Initialize a map to hold unique users
@@ -70,6 +70,49 @@ global with sharing class UsersManagmentController {
     //     // Return the list of unique users
     //     return uniqueUsersMap.values();
     // }
+
+
+
+
+
+    @AuraEnabled
+    public static List<UserWrapper> getAllusersApex(){
+        try {
+            List<User> CommunityUser = new List<User>();
+            // System.debug(userName);
+            
+
+                CommunityUser = [select Profile.UserLicense.Name,  Lastname,Account.Name ,email,alias ,username, isActive,  Id, Profile.Name from user where Profile.Name in ('Customer Community User', 'Customer Community Login User')];
+           
+            List<userWrapper> listW = new List<userWrapper>();
+
+            for(User u : CommunityUser){
+                listW.add(new UserWrapper(u));
+            }
+
+            return listW;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @AuraEnabled
     public static List<UserWrapper> getCommunityUserByProfiles(String networkId, String userName){
@@ -365,5 +408,98 @@ return contactIds;
     public static String getOrgBaseUrl() {
         return URL.getOrgDomainUrl().toExternalForm();
     }
+
+
+
+    @AuraEnabled
+public static String createCaseWithAttachments(String subject, String description, String email, List<Map<String, String>> files, String status, String priority, String type) {
+    System.debug('files received: ' + files);
     
+    
+    // Retrieve or create the contact
+
+
+    
+    // Create the case
+    Case newCase = new Case(
+        Subject = subject,
+        Description = description,
+        SuppliedEmail = email,
+        Origin = 'Web',
+        Status = status,
+        Priority = priority,
+        Type = type
+        
+    );
+    try {
+        insert newCase;
+    } catch (DmlException e) {
+        System.debug('Error creating case: ' + e.getMessage());
+        throw new AuraHandledException('Error creating case: ' + e.getMessage());
+    }
+    
+     // If there are attachments, create them
+     if (files != null && !files.isEmpty()) {
+        List<Attachment> attachmentList = new List<Attachment>();
+        for (Map<String, String> fileMap : files) {
+            String fileName = fileMap.get('fileName');
+            String base64Data = fileMap.get('base64Data');
+            
+            System.debug('Processing file: ' + fileName);
+            System.debug('Base64 Data: ' + base64Data);
+            
+            if (fileName != null && base64Data != null) {
+                try {
+                    // Decode the base64 content and create the attachment
+                    Attachment att = new Attachment(
+                        Body = EncodingUtil.base64Decode(base64Data),
+                        Name = fileName,
+                        ParentId = newCase.Id
+                    );
+                    attachmentList.add(att);
+                } catch (System.StringException e) {
+                    System.debug('Error decoding file: ' + fileName + ' - ' + e.getMessage());
+                }
+            } else {
+                System.debug('Skipping null or incomplete file entry');
+            }
+        }
+        if (!attachmentList.isEmpty()) {
+            insert attachmentList;
+        }
+    }
+
+    return newCase.Id;
+}
+
+    @auraEnabled 
+    public static void switchToCommunityUserApex(String userID){
+        
+        User u = [select Name, Id from User where Id =: userID limit 1 ];
+        Profile comunityUserPrfileId = [select Id from profile where Name ='Customer Community User' limit 1];
+        u.ProfileId = comunityUserPrfileId.Id;
+        System.debug('id : '+ userID);
+        try{
+            update u;
+            System.debug('user updated');
+        }catch(DMLException e){
+            System.debug('excetion caught : '+ e);
+        }
+    }
+    
+
+    @auraEnabled 
+    public static void switchToCommunityLoginUserApex(String userID){
+        
+        User u = [select Name, Id from User where Id =: userID limit 1 ];
+        Profile comunityUserPrfileId = [select Id from profile where Name ='Customer Community Login User' limit 1];
+        u.ProfileId = comunityUserPrfileId.Id;
+        System.debug('id : '+ userID);
+        try{
+            update u;
+            System.debug('user updated');
+        }catch(DMLException e){
+            System.debug('excetion caught : '+ e);
+        }
+    }
 }
