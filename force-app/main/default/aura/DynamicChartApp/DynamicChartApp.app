@@ -2,6 +2,9 @@
     <aura:attribute type="String" name="data"></aura:attribute>
     <aura:attribute name="communititesnames" type="String[]"/>
     <aura:attribute name="netList" type="Network[]"/>
+    <aura:attribute name="AllUsers" type="Object[]"/> 
+    <aura:attribute name="listOfAccounts" type="Object[]"/>
+    <aura:attribute name="selectedNetworkId" type="String" /> 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
 
